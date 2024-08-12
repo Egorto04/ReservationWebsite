@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Seat Selection</title>
+</head>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flight Prices</title>
+    <style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            border: 1px solid black;
+            padding: 8px;
+            text-align: center;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        caption {
+            font-size: 1.5em;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+<form th:action="@{/main-page/passenger-info}" th:object="${reservation}" method="post">
+<table>
+    <caption>Flight Prices</caption>
+    <thead>
+    <tr>
+        <th>Flight Type</th>
+        <th>Economy Price</th>
+        <th>Business Price</th>
+        <th>Economy Seat Available</th>
+        <th>Business Seat Available</th>
+        <th>Economy</th>
+        <th>Business</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr>
+        <td>Going</td>
+        <td th:text=" ${flightOne.economyPrice}"></td> <!-- Replace with actual economy price for going flight -->
+        <td th:text="${flightOne.bussinessPrice}"></td>
+        <td th:text="${flightOne.economySeat}"></td>
+        <td th:text="${flightOne.businessSeat}"></td>
+        <td><input type="radio" name="goFlight" th:field="${reservation.firstType}" th:value="Economy"></td>
+        <td><input type="radio" name="goFlight" th:field="${reservation.firstType}" th:value="Business"></td>
+        <!-- Replace with actual business price for going flight -->
+    </tr>
+    <tr th:if="${isRoundTrip}">
+        <td>Returning</td>
+        <td th:text="${flightTwo.economyPrice}">Economy Price for Returning Flight</td>
+        <td th:text="${flightTwo.bussinessPrice}">Business Price for Returning Flight</td>
+        <td th:text="${flightTwo.economySeat}">Business Price for Returning Flight</td>
+        <td th:text="${flightTwo.businessSeat}">Business Price for Returning Flight</td>
+        <td><input type="radio" name="returnFlight" th:field="${reservation.secondType}" th:value="'Economy'"></td>
+        <td><input type="radio" name="returnFlight" th:field="${reservation.secondType}" th:value="'Business'"></td>
+    </tr>
+    </tbody>
+</table>
+
+    <input type="submit" th:value="Save">
+</form>
+</body>
+</html>

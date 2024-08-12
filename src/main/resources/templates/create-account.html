@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <title>Create Account</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f2f5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .account-container {
+            background-color: #ffffff;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+            width: 350px;
+            text-align: center;
+        }
+
+        h2 {
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        input[type="text"],
+        input[type="password"],
+        input[type="email"] {
+            width: 100%;
+            padding: 10px;
+            margin: 8px 0;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+
+        input[type="submit"] {
+            width: 100%;
+            background-color: #4CAF50;
+            color: white;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-top: 20px;
+        }
+
+        input[type="submit"]:hover {
+            background-color: #45a049;
+        }
+
+        .error-message {
+            color: #d32f2f;
+            font-size: 14px;
+            margin-top: -10px;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="account-container">
+    <h2>Create Account</h2>
+    <form th:action="@{/creatingAccount}" th:object="${webUser}" method="post">
+
+        <input type="text" th:field="*{firstName}" placeholder="First Name" required>
+        <div th:if="${#fields.hasErrors('firstName')}" th:errors="*{firstName}" class="error-message"></div>
+
+        <input type="text" th:field="*{lastName}" placeholder="Last Name" required>
+        <div th:if="${#fields.hasErrors('lastName')}" th:errors="*{lastName}" class="error-message"></div>
+
+        <input type="text" th:field="*{username}" placeholder="Username" required>
+        <div th:if="${#fields.hasErrors('username')}" th:errors="*{username}" class="error-message"></div>
+
+        <input type="email" th:field="*{email}" placeholder="Email" required>
+        <div th:if="${#fields.hasErrors('email')}" th:errors="*{email}" class="error-message"></div>
+
+        <input type="password" th:field="*{password}" placeholder="Password" required>
+        <div th:if="${#fields.hasErrors('password')}" th:errors="*{password}" class="error-message"></div>
+
+        <input type="submit" value="Create Account">
+    </form>
+</div>
+
+</body>
+</html>

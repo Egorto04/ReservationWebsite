@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Search Plane</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 20px;
+            color: #333;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 6px;
+            font-weight: bold;
+        }
+
+        input[type="text"],
+        input[type="date"],
+        select {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 12px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        .radio-group {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+
+        .radio-group label {
+            background-color: #e0e0e0;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            padding: 10px 20px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            text-align: center;
+            flex-grow: 1;
+            margin: 0 5px;
+        }
+
+        .radio-group input[type="radio"] {
+            display: none;
+        }
+
+        .radio-group input[type="radio"]:checked + label {
+            background-color: #4CAF50;
+            color: white;
+            border-color: #4CAF50;
+        }
+
+        .radio-group label:hover {
+            background-color: #d5d5d5;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        input[type="submit"] {
+            width: 100%;
+            padding: 10px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        input[type="submit"]:hover {
+            background-color: #45a049;
+        }
+
+        .logout-form {
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        .logout-form input[type="submit"] {
+            width: auto;
+            padding: 8px 16px;
+            background-color: #f44336;
+        }
+
+        .logout-form input[type="submit"]:hover {
+            background-color: #e53935;
+        }
+
+        .error-message {
+            color: #d32f2f;
+            font-size: 14px;
+            margin-top: -10px;
+            margin-bottom: 10px;
+        }
+    </style>
+    <script>
+        function setMinDepartureDate() {
+            var today = new Date().toISOString().split('T')[0];
+            document.getElementById("departureDate").setAttribute('min', today);
+        }
+
+        function updateArrivalDateMin() {
+            var departureDate = document.getElementById("departureDate").value;
+            var arrivalDateInput = document.getElementById("arrivalDate");
+
+            if (departureDate) {
+                arrivalDateInput.setAttribute('min', departureDate);
+
+                if (arrivalDateInput.value && arrivalDateInput.value < departureDate) {
+                    arrivalDateInput.value = "";
+                    alert("Please select an arrival date that is after the departure date.");
+
+                }
+            }
+        }
+
+        function updateLandingOptions() {
+            var departureSelect = document.getElementById("departure");
+            var landingSelect = document.getElementById("landing");
+            var selectedDeparture = departureSelect.value;
+
+            for (var i = 0; i < landingSelect.options.length; i++) {
+                landingSelect.options[i].disabled = false;
+            }
+
+            for (var i = 0; i < landingSelect.options.length; i++) {
+                if (landingSelect.options[i].value === selectedDeparture) {
+                    landingSelect.options[i].disabled = true;
+                    break;
+                }
+            }
+        }
+
+        window.onload = function() {
+            setMinDepartureDate();
+
+            var departureDateInput = document.getElementById("departureDate");
+            if (departureDateInput.value) {
+                updateArrivalDateMin();
+            }
+
+            departureDateInput.addEventListener("change", updateArrivalDateMin);
+            // Initial update on page load
+            updateLandingOptions();
+
+            // Add event listener to departure dropdown
+            document.getElementById("departure").addEventListener("change", updateLandingOptions);
+
+            // Add event listener to submit button
+            document.querySelector("input[type='submit']").addEventListener("click", function(event) {
+                var departureSelect = document.getElementById("departure");
+                var landingSelect = document.getElementById("landing");
+                var dateSelect = document.getElementById("departureDate");
+
+                var selectedDate = new Date(dateSelect.value);
+                var selectedDeparture = departureSelect.value;
+                var selectedLanding = landingSelect.value;
+
+                var adultSelect = document.getElementById("adult");
+                var childSelect = document.getElementById("child");
+                var infantSelect = document.getElementById("infant");
+
+                var adult = parseInt(adultSelect.value);
+                var child = parseInt(childSelect.value);
+                var infant = parseInt(infantSelect.value);
+
+                if (adult === 0)
+                {
+                    event.preventDefault();
+                    alert("At least one adult must be selected.");
+                }
+
+                if (selectedDeparture === selectedLanding) {
+                    event.preventDefault();
+                    alert("Departure and landing cannot be the same.");
+                }
+            });
+        };
+    </script>
+</head>
+<body>
+
+<div class="container">
+    <h1>Search Plane</h1>
+    <p>User: <span sec:authentication="principal.username"></span></p>
+
+    <form action="#" th:action="@{/main-page/checkValid}" th:object="${flight}" method="post">
+        <div th:if="${error}" class="error-message" th:text="${error}"></div>
+        <div class="radio-group">
+            <input type="radio" id="one_way" name="choice" th:field="*{direction}" value="One-Way" required>
+            <label for="one_way">One-Way</label>
+
+            <input type="radio" id="roundtrip" name="choice" th:field="*{direction}" value="Roundtrip" required>
+            <label for="roundtrip">Roundtrip</label>
+        </div>
+
+        <div class="form-group">
+            <label for="departure">Departure</label>
+            <select id="departure" th:field="*{departure}">
+                <option th:each="cont: ${countries}" th:value="${cont}" th:text="${cont}"></option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="landing">Landing</label>
+            <select id="landing" th:field="*{landing}">
+                <option th:each="cont: ${countries}" th:value="${cont}" th:text="${cont}"></option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="departureDate">Departure Date</label>
+            <input type="date" id="departureDate" th:field="*{departureDate}" />
+            <div th:if="${#fields.hasErrors('departureDate')}" class="error-message" th:errors="*{departureDate}"></div>
+        </div>
+
+        <div class="form-group">
+            <label for="arrivalDate">Arrival Date</label>
+            <input type="date" id="arrivalDate" th:field="*{arrivalDate}" />
+            <div th:if="${#fields.hasErrors('arrivalDate')}" class="error-message" th:errors="*{arrivalDate}"></div>
+        </div>
+
+        <div class="form-group">
+            <label for="adult">Adult Number</label>
+            <select id="adult" th:field="*{adult}" required>
+                <option th:each="num: ${numbers}" th:value="${num}" th:text="${num}"></option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="child">Child Number</label>
+            <select id="child" th:field="*{child}">
+                <option th:each="num: ${numbers}" th:value="${num}" th:text="${num}"></option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="infant">Infant Number</label>
+            <select id="infant" th:field="*{infant}">
+                <option th:each="num: ${numbers}" th:value="${num}" th:text="${num}"></option>
+            </select>
+        </div>
+
+        <input type="submit" value="Search">
+    </form>
+
+    <div class="logout-form">
+        <form action="#" th:action="@{/logout}" method="post">
+            <input type="submit" value="Logout">
+        </form>
+    </div>
+</div>
+
+</body>
+</html>

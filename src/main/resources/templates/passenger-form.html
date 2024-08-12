@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Create Passenger Form</title>
+    <style>
+        .passenger-form {
+            margin-bottom: 20px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        label {
+            display: inline-block;
+            width: 100px;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        input[type="text"], input[type="date"], select {
+            width: 200px;
+            margin-bottom: 10px;
+        }
+
+        input[type="submit"] {
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        input[type="submit"]:hover {
+            background-color: #45a049;
+        }
+
+        .remove-passenger {
+            color: red;
+            cursor: pointer;
+            font-size: 0.9em;
+        }
+    </style>
+</head>
+<body>
+
+<h1>Create Passenger Form</h1>
+<form id="passengerForm" action="/submit-passenger-data" method="post">
+    <div id="passengerContainer">
+        <!-- Passenger forms will be appended here -->
+    </div>
+    <input type="submit" value="Submit">
+</form>
+<script>
+
+    document.addEventListener('DOMContentLoaded', function() {
+        const passengerContainer = document.getElementById('passengerContainer');
+        let passengerCount = 0;
+
+        // Get the values from the hidden input fields
+        let adultNum = parseInt(document.getElementById("adult").value) || 0;
+        let childNum = parseInt(document.getElementById("child").value) || 0;
+        let infantNum = parseInt(document.getElementById("infant").value) || 0;
+
+        // Loop to create forms for adults
+        for (let i = 0; i < adultNum; i++) {
+            addPassengerForm('Adult');
+        }
+
+        // Loop to create forms for children
+        for (let i = 0; i < childNum; i++) {
+            addPassengerForm('Child');
+        }
+
+        // Loop to create forms for infants
+        for (let i = 0; i < infantNum; i++) {
+            addPassengerForm('Infant');
+        }
+
+        function addPassengerForm(type) {
+            passengerCount++;
+
+            // Create a new div for the passenger form
+            const passengerDiv = document.createElement('div');
+            passengerDiv.className = 'passenger-form';
+            passengerDiv.id = `passenger-${passengerCount}`;
+
+            // Add form fields to the passenger div
+            passengerDiv.innerHTML = `
+                <fieldset>
+                    <legend>${type} Passenger ${passengerCount}</legend>
+
+                    <label for="name-${passengerCount}">Name:</label>
+                    <input type="text" name="passengers[${passengerCount}].name" id="name-${passengerCount}" required><br/>
+
+                    <label for="surname-${passengerCount}">Surname:</label>
+                    <input type="text" name="passengers[${passengerCount}].surname" id="surname-${passengerCount}" required><br/>
+
+                    <label for="birthDate-${passengerCount}">Birth Date:</label>
+                    <input type="date" name="passengers[${passengerCount}].birthDate" id="birthDate-${passengerCount}" required><br/>
+
+                    <label for="gender-${passengerCount}">Gender:</label>
+                    <select name="passengers[${passengerCount}].gender" id="gender-${passengerCount}">
+                        <option value="Male">Male</option>
+                        <option value="Female">Female</option>
+                    </select><br/>
+
+                    <label for="passportNo-${passengerCount}">Passport No:</label>
+                    <input type="text" name="passengers[${passengerCount}].passportNo" id="passportNo-${passengerCount}" required><br/>
+
+                    <label for="nationalityNo-${passengerCount}">Nationality No:</label>
+                    <input type="text" name="passengers[${passengerCount}].nationalityNo" id="nationalityNo-${passengerCount}" required><br/>
+
+                    <label for="telNo-${passengerCount}">Tel No:</label>
+                    <input type="text" name="passengers[${passengerCount}].telNo" id="telNo-${passengerCount}" required><br/>
+
+                    <label for="email-${passengerCount}">Email:</label>
+                    <input type="email" name="passengers[${passengerCount}].email" id="email-${passengerCount}" required><br/>
+                </fieldset>
+            `;
+            // Append the passenger div to the container
+            passengerContainer.appendChild(passengerDiv);
+        }
+        document.getElementById('passengerForm').addEventListener('submit', function(event) {
+            event.preventDefault(); // Prevent default form submission
+
+            // Gather form data into an array
+            let passengers = [];
+
+            for (let i = 1; i <= passengerCount; i++) {
+                let passenger = {
+                    name: document.getElementById(`name-${i}`).value,
+                    surname: document.getElementById(`surname-${i}`).value,
+                    birthDate: document.getElementById(`birthDate-${i}`).value,
+                    gender: document.getElementById(`gender-${i}`).value,
+                    passportNo: document.getElementById(`passportNo-${i}`).value,
+                    nationalityNo: document.getElementById(`nationalityNo-${i}`).value,
+                    telNo: document.getElementById(`telNo-${i}`).value,
+                    email: document.getElementById(`email-${i}`).value
+                };
+                passengers.push(passenger);
+            }
+
+            console.log(passengers); // For debugging
+
+            // Send the data to the server using fetch
+            fetch('/main-page/submit-passenger-data', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(passengers)
+            })
+                .then(response => response.json())
+                .then(data => {
+                    console.log(data);
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+        });
+    });
+
+</script>
+
+<!-- Hidden inputs to store the number of passengers -->
+<input type="hidden" name="adultNum" id="adult" th:value="${adult}">
+<input type="hidden" name="childNum" id="child" th:value="${child}">
+<input type="hidden" name="infantNum" id="infant" th:value="${infant}">
+
+</body>
+</html>

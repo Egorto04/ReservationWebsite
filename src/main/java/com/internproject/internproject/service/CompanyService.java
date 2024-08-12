@@ -1,0 +1,157 @@
+package com.internproject.internproject.service;
+
+
+import com.internproject.internproject.dao.*;
+import com.internproject.internproject.entity.*;
+import jakarta.annotation.PostConstruct;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.sql.Date;
+import java.util.*;
+
+@Service
+public class CompanyService implements UserDetailsService {
+
+    UserDAO userDAO;
+    RoleDAO roleDAO;
+    PlaneDAO planeDAO;
+    ReservationDAO reservationDAO;
+    UserPNRDAO userPNRDAO;
+
+    @Autowired
+    public CompanyService(UserDAO userDAO, RoleDAO roleDAO, PlaneDAO planeDAO, ReservationDAO reservationDAO, UserPNRDAO userPNRDAO) {
+        this.userDAO = userDAO;
+        this.roleDAO = roleDAO;
+        this.planeDAO = planeDAO;
+        this.reservationDAO = reservationDAO;
+        this.userPNRDAO = userPNRDAO;
+    }
+
+
+
+
+    @Transactional
+    public void saveUser(User user) {
+        userDAO.save(user);
+    }
+
+    @Transactional
+    public void savePNR(UserPNR userPNR) {userPNRDAO.save(userPNR);}
+
+    @Transactional
+    public void savePlane(Plane plane)
+    {
+        planeDAO.save(plane);
+    }
+
+    @Transactional
+    public void saveReservation(Reservation reservation)
+    {
+        reservationDAO.save(reservation);
+    }
+
+    public Reservation findReservation(String reservationId)
+    {
+        return reservationDAO.findById(reservationId);
+    }
+    public List<Plane> findPlane(String departure, String landing, Date departureDate)
+    {
+        List<Plane> planes = planeDAO.getPlaneByDepartureLanding(departure,landing,departureDate);
+        planes.sort(new Comparator<Plane>() {
+            @Override
+            public int compare(Plane o1, Plane o2) {
+                String t1 = o1.getTimeDeparture();
+                String t2 = o2.getTimeDeparture();
+                return t1.compareTo(t2);
+            }
+        });
+        return planes;
+    }
+
+    public Plane findById(int id)
+    {
+        return planeDAO.getPlaneById(id);
+    }
+
+//
+//    @PostConstruct
+//    public void createPlanes(){
+//        Random rand = new Random();
+//        String[] locations = new String[]{"Ankara","Istanbul"};
+//        for (int i = 0; i < 1000; i++) {
+//            Plane p = new Plane();
+//            int randNum = rand.nextInt(locations.length);
+//            p.setDepartureLocation(locations[randNum]);
+//            int randNum2;
+//            do {
+//                randNum2 = rand.nextInt(locations.length);
+//            }while (randNum == randNum2);
+//            p.setLandingLocation(locations[randNum2]);
+//            int randMonth = rand.nextInt(8,12);
+//            int randDay = rand.nextInt(30);
+//            Date d = new Date(124, randMonth, randDay);
+//            p.setDateDeparture(d);
+//            p.setAvailabeSeats(rand.nextInt(4,8)*50);
+//            p.setBussinessPrice(rand.nextInt(1,9)*1000);
+//            p.setEconomyPrice(rand.nextInt(1,9)*100);
+//            int businessSeatAmount = rand.nextInt(0,10)*5;
+//            int economySeatAmount = p.getAvailabeSeats()-businessSeatAmount;
+//            p.setBusinessSeat(businessSeatAmount);
+//            p.setEconomySeat(economySeatAmount);
+//            System.out.println(businessSeatAmount + " " + economySeatAmount);
+//            int randHour = rand.nextInt(24);
+//            int randMinute = rand.nextInt(12)*5;
+//            String hour = Integer.toString(randHour);
+//            String minute = Integer.toString(randMinute);
+//            if (randHour == 0)
+//            {
+//                hour = "00";
+//            }else if (randHour < 10)
+//            {
+//                hour = "0"+randHour;
+//            }
+//            if (randMinute == 0)
+//            {
+//                minute = "00";
+//            }else if (randMinute < 10)
+//            {
+//                minute = "0"+randMinute;
+//            }
+//            p.setTimeDeparture(hour+":"+minute);
+//            planeDAO.save(p);
+//        }
+//    }
+
+
+    @Override
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        User user = userDAO.findByUsername(username);
+
+        if (user == null) {
+            throw new UsernameNotFoundException("Invalid username or password.");
+        }
+
+        Collection<SimpleGrantedAuthority> authorities = mapRolestoAuthorities(user.getRoles());
+
+        return new org.springframework.security.core.userdetails.User(user.getUsername(), user.getPassword(), authorities);
+    }
+
+    private Collection<SimpleGrantedAuthority> mapRolestoAuthorities(Collection<Role> roles) {
+        Collection<SimpleGrantedAuthority> authorities = new ArrayList<SimpleGrantedAuthority>();
+        for (Role role : roles) {
+            authorities.add(new SimpleGrantedAuthority(role.getName()));
+        }
+        return authorities;
+    }
+
+    public User findUserByUsername(String username) {
+        return userDAO.findByUsername(username);
+    }
+}
