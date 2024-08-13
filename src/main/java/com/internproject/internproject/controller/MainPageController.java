@@ -46,6 +46,8 @@ public class MainPageController {
 
     private boolean isRoundTrip;
 
+    private List<UserPNR> users;
+
     @RequestMapping("/home")
     public String home(Model model, @ModelAttribute("error") String error) {
         model.addAttribute("countries", countries);
@@ -230,24 +232,34 @@ public class MainPageController {
         return "passenger-form";
     }
 
-    @GetMapping("/submit-passenger-data")
+    @RequestMapping("/submit-passenger-data")
     public String submitPassengerData(@RequestBody List<UserPNR> users) throws JsonProcessingException {
-
-        for (UserPNR user: users)
-        {
-            System.out.println(user);
-        }
-
-        return "reservation-confirmation";
+        this.users = users;
+        return "redirect:/main-page/reservation-info";
     }
 
-    @PostMapping("/reservation-info")
-    public String reservationForm(@ModelAttribute("aaaa") List<UserPNR> users)
+    @RequestMapping("/reservation-info")
+    public String reservationForm()
     {
         for (UserPNR user: users)
         {
+            user.setPnr(reservation.getPnrCode());
+        }
+        int count = 0;
+        for (UserPNR user: users)
+        {
+            count++;
+            System.out.println(count);
             System.out.println(user);
         }
+        return "redirect:/main-page/reservation-confirmed";
+    }
+
+    @RequestMapping("/reservation-confirmed")
+    public String reservationConfirmed()
+    {
+
+
         return "reservation-confirmation";
     }
 

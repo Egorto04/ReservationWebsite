@@ -21,6 +21,13 @@
             box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
             width: 350px;
             text-align: center;
+            position: relative;
+        }
+
+        .login-container img {
+            width: 80px;
+            height: auto;
+            margin-bottom: 20px;
         }
 
         h3 {
@@ -106,6 +113,7 @@
 <body>
 
 <div class="login-container">
+    <img src="/static/hitit_logo_final.jpg" alt="Logo">
     <h3>My Custom Login Page</h3>
     <div th:if="${param.logout}" class="success-message">
         <p>Successfully Logged Out!!</p>

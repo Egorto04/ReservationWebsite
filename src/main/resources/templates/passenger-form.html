@@ -2,6 +2,8 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
+    <meta name="_csrf" th:content="${_csrf.token}"/>
+    <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
     <title>Create Passenger Form</title>
     <style>
         .passenger-form {
@@ -31,32 +33,38 @@
             border-radius: 5px;
             cursor: pointer;
         }
+        .continue{
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
 
         input[type="submit"]:hover {
             background-color: #45a049;
         }
 
-        .remove-passenger {
-            color: red;
-            cursor: pointer;
-            font-size: 0.9em;
-        }
+
     </style>
 </head>
 <body>
 
 <h1>Create Passenger Form</h1>
-<form id="passengerForm" action="/submit-passenger-data" method="post">
+<form id="passengerForm" method="post">
     <div id="passengerContainer">
         <!-- Passenger forms will be appended here -->
     </div>
-    <input type="submit" value="Submit">
+    <input type="submit" value="Save">
 </form>
 <script>
-
     document.addEventListener('DOMContentLoaded', function() {
         const passengerContainer = document.getElementById('passengerContainer');
         let passengerCount = 0;
+
+        const csrfToken = document.querySelector('meta[name="_csrf"]').getAttribute('content');
+        const csrfHeader = document.querySelector('meta[name="_csrf_header"]').getAttribute('content');
 
         // Get the values from the hidden input fields
         let adultNum = parseInt(document.getElementById("adult").value) || 0;
@@ -122,6 +130,7 @@
             // Append the passenger div to the container
             passengerContainer.appendChild(passengerDiv);
         }
+
         document.getElementById('passengerForm').addEventListener('submit', function(event) {
             event.preventDefault(); // Prevent default form submission
 
@@ -142,17 +151,22 @@
                 passengers.push(passenger);
             }
 
-            console.log(passengers); // For debugging
-
-            // Send the data to the server using fetch
+            console.log(passengers);
             fetch('/main-page/submit-passenger-data', {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/json',
+                    [csrfHeader]: csrfToken
                 },
                 body: JSON.stringify(passengers)
             })
-                .then(response => response.json())
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    window.location.href = "/main-page/reservation-confirmed";
+                    return response.json();
+                })
                 .then(data => {
                     console.log(data);
                 })
@@ -161,7 +175,6 @@
                 });
         });
     });
-
 </script>
 
 <!-- Hidden inputs to store the number of passengers -->
