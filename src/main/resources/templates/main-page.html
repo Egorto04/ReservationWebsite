@@ -116,6 +116,49 @@
             margin-top: -10px;
             margin-bottom: 10px;
         }
+        .sidebar {
+            width: 250px;
+            background-color: #333;
+            color: white;
+            padding: 20px;
+            box-sizing: border-box;
+            height: 100vh;
+            position: fixed;
+            top: 0;
+            left: 0;
+        }
+
+
+        .sidebar h2 {
+            color: white;
+        }
+
+        .sidebar a {
+            color: white;
+            display: block;
+            padding: 10px;
+            text-decoration: none;
+            margin-bottom: 10px;
+        }
+
+        .sidebar a:hover {
+            background-color: #575757;
+        }
+        .toggle-btn {
+            position: fixed;
+            top: 20px;
+            left: 260px;
+            background-color: #333;
+            color: white;
+            border: none;
+            padding: 10px;
+            cursor: pointer;
+            transition: left 0.3s ease;
+        }
+
+        .toggle-btn.sidebar-closed {
+            left: 70px;
+        }
     </style>
     <script>
         function setMinDepartureDate() {
@@ -201,10 +244,27 @@
             });
         };
     </script>
+    <script>
+        document.getElementById("toggle-btn").addEventListener("click", function() {
+            var sidebar = document.getElementById("sidebar");
+            var mainContent = document.getElementById("main-content");
+            var toggleBtn = document.getElementById("toggle-btn");
+
+            sidebar.classList.toggle("close");
+            mainContent.classList.toggle("sidebar-closed");
+            toggleBtn.classList.toggle("sidebar-closed");
+        });
+    </script>
 </head>
 <body>
-
-<div class="container">
+<div class="sidebar">
+    <h2>Menu</h2>
+    <a href="/section1" th:href="@{/section1}">Search Plane</a>
+    <a href="/section2" th:href="@{/section2}">Reservations</a>
+    <a href="/section3" th:href="@{/section3}">Payment</a>
+</div>
+<button class="toggle-btn" id="toggle-btn">☰</button>
+<div class="container" id="main-content">
     <h1>Search Plane</h1>
     <p>User: <span sec:authentication="principal.username"></span></p>
 

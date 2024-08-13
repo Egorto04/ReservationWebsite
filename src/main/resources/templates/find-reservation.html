@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Find Reservation</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+            color: #333;
+            display: flex;
+        }
+
+        .sidebar {
+            width: 250px;
+            background-color: #333;
+            color: white;
+            padding: 20px;
+            box-sizing: border-box;
+            height: 100vh;
+            position: fixed;
+            top: 0;
+            left: 0;
+        }
+
+        .sidebar h2 {
+            color: white;
+        }
+
+        .sidebar a {
+            color: white;
+            display: block;
+            padding: 10px;
+            text-decoration: none;
+            margin-bottom: 10px;
+            border-radius: 4px;
+            transition: background-color 0.3s;
+        }
+
+        .sidebar a:hover {
+            background-color: #575757;
+        }
+
+        .container {
+            margin-left: 270px;
+            padding: 40px;
+            flex-grow: 1;
+        }
+
+        .form-container {
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            max-width: 400px;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        .form-container h1 {
+            margin-bottom: 20px;
+            font-size: 24px;
+            color: #333;
+        }
+
+        .form-container label {
+            font-weight: bold;
+            margin-bottom: 8px;
+            display: block;
+            text-align: left;
+        }
+
+        .form-container input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 20px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 16px;
+        }
+
+        .form-container input[type="submit"] {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s;
+        }
+
+        .form-container input[type="submit"]:hover {
+            background-color: #45a049;
+        }
+
+        .form-container .info-text {
+            margin-top: 20px;
+            color: #777;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="sidebar">
+    <h2>Menu</h2>
+    <a href="/section1" th:href="@{/section1}">Search Plane</a>
+    <a href="/section2" th:href="@{/section2}">Reservations</a>
+    <a href="/section3" th:href="@{/section3}">Payment</a>
+</div>
+
+<div class="container">
+    <div class="form-container">
+        <h1>Find Your Reservation</h1>
+        <div th:if="${error} != null" style="color: red; margin-bottom: 20px;" th:text="${error}"></div>
+
+        <form th:action="@{/main-page/find-reservation-info}" method="post">
+            <label for="pnrCode">PNR Code:</label>
+            <input type="text" id="pnrCode" name="pnrCode" required placeholder="Enter your PNR code">
+            <input type="submit" value="Find Reservation">
+        </form>
+        <div class="info-text">
+            <p>Enter the PNR code provided in your booking confirmation email.</p>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

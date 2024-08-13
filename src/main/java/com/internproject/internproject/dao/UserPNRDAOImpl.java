@@ -17,9 +17,10 @@ public class UserPNRDAOImpl implements UserPNRDAO{
     public UserPNRDAOImpl(EntityManager em) {
         this.em = em;
     }
+
     @Override
     public void save(UserPNR user) {
-        em.persist(user);
+        em.merge(user);
     }
 
     @Override
@@ -34,7 +35,7 @@ public class UserPNRDAOImpl implements UserPNRDAO{
 
     @Override
     public void delete(int id) {
-
+        em.createQuery("delete from UserPNR where id=:id").setParameter("id", id).executeUpdate();
     }
 
     @Override

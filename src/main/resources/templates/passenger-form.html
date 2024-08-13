@@ -164,7 +164,7 @@
                     if (!response.ok) {
                         throw new Error('Network response was not ok');
                     }
-                    window.location.href = "/main-page/reservation-confirmed";
+                    window.location.href = "/main-page/payment";
                     return response.json();
                 })
                 .then(data => {

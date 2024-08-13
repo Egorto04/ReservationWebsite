@@ -11,4 +11,8 @@ public interface ReservationDAO {
     public Reservation findById(String id);
 
     public List<Reservation> findAll();
+
+    public void delete(String id);
+
+    public void changeRes(String id);
 }

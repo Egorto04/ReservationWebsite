@@ -49,18 +49,18 @@
         <td th:text="${flightOne.bussinessPrice}"></td>
         <td th:text="${flightOne.economySeat}"></td>
         <td th:text="${flightOne.businessSeat}"></td>
-        <td><input type="radio" name="goFlight" th:field="${reservation.firstType}" th:value="Economy"></td>
-        <td><input type="radio" name="goFlight" th:field="${reservation.firstType}" th:value="Business"></td>
+        <td><input type="radio" name="goFlight" th:field="${reservation.firstType}" th:value="Economy" required></td>
+        <td><input type="radio" name="goFlight" th:field="${reservation.firstType}" th:value="Business" required></td>
         <!-- Replace with actual business price for going flight -->
     </tr>
     <tr th:if="${isRoundTrip}">
         <td>Returning</td>
-        <td th:text="${flightTwo.economyPrice}">Economy Price for Returning Flight</td>
-        <td th:text="${flightTwo.bussinessPrice}">Business Price for Returning Flight</td>
-        <td th:text="${flightTwo.economySeat}">Business Price for Returning Flight</td>
-        <td th:text="${flightTwo.businessSeat}">Business Price for Returning Flight</td>
-        <td><input type="radio" name="returnFlight" th:field="${reservation.secondType}" th:value="'Economy'"></td>
-        <td><input type="radio" name="returnFlight" th:field="${reservation.secondType}" th:value="'Business'"></td>
+        <td th:text="${flightTwo.economyPrice}"></td>
+        <td th:text="${flightTwo.bussinessPrice}"></td>
+        <td th:text="${flightTwo.economySeat}"></td>
+        <td th:text="${flightTwo.businessSeat}"></td>
+        <td><input type="radio" name="returnFlight" th:field="${reservation.secondType}" th:value="'Economy'" required></td>
+        <td><input type="radio" name="returnFlight" th:field="${reservation.secondType}" th:value="'Business'" required></td>
     </tr>
     </tbody>
 </table>

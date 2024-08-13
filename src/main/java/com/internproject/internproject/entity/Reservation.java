@@ -25,12 +25,24 @@ public class Reservation {
     @Column(name = "second_type")
     private String secondType;
 
-    public Reservation(String pnrCode, int flightNumberOne, int flightNumberTwo, String firstType, String secondType) {
+    @Column(name = "status")
+    private String status;
+
+    @Column(name = "first_price")
+    private int firstPrice;
+
+    @Column(name = "second_price")
+    private int secondPrice;
+
+    public Reservation(String pnrCode, int flightNumberOne, int flightNumberTwo, String firstType, String secondType, String status, int firstPrice, int secondPrice) {
         this.pnrCode = pnrCode;
         this.flightNumberOne = flightNumberOne;
         this.flightNumberTwo = flightNumberTwo;
         this.firstType = firstType;
         this.secondType = secondType;
+        this.status = status;
+        this.firstPrice = firstPrice;
+        this.secondPrice = secondPrice;
     }
 
     public Reservation() {
@@ -74,6 +86,30 @@ public class Reservation {
 
     public void setSecondType(String secondType) {
         this.secondType = secondType;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+    public int getFirstPrice() {
+        return firstPrice;
+    }
+
+    public void setFirstPrice(int firstPrice) {
+        this.firstPrice = firstPrice;
+    }
+
+    public int getSecondPrice() {
+        return secondPrice;
+    }
+
+    public void setSecondPrice(int secondPrice) {
+        this.secondPrice = secondPrice;
     }
 
     @Override

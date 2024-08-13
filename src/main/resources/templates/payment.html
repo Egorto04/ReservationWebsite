@@ -2,7 +2,8 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Reservation Info</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payment Information</title>
     <style>
         table {
             width: 100%;
@@ -22,6 +23,7 @@
     </style>
 </head>
 <body>
+<h2>Reservation Information</h2>
 <h2>PNR Code for the reservation</h2>
 <h2 th:text="${reservation.pnrCode}"></h2>
 
@@ -69,29 +71,35 @@
     </tr>
     </thead>
     <tbody>
-    <tr>
-        <td>Flight One</td>
-        <td th:text="${planeOne.departureLocation}"></td>
-        <td th:text="${planeOne.landingLocation}"></td>
-        <td th:text="${planeOne.dateDeparture}"></td>
-        <td th:text="${planeOne.timeDeparture}"></td>
-        <td th:text="${reservation.firstType}"></td>
-        <td th:text="${reservation.firstPrice}"></td>
-    </tr>
-    <tr th:if="${reservation.flightNumberTwo} != 0">
-        <td>Flight Two</td>
-        <td th:text="${planeTwo.departureLocation}"></td>
-        <td th:text="${planeTwo.landingLocation}"></td>
-        <td th:text="${planeTwo.dateDeparture}"></td>
-        <td th:text="${planeTwo.timeDeparture}"></td>
-        <td th:text="${reservation.secondType}"></td>
-        <td th:text="${reservation.secondPrice}"></td>
-    </tr>
+        <tr>
+            <td>Flight One</td>
+            <td th:text="${planeOne.departureLocation}"></td>
+            <td th:text="${planeOne.landingLocation}"></td>
+            <td th:text="${planeOne.dateDeparture}"></td>
+            <td th:text="${planeOne.timeDeparture}"></td>
+            <td th:text="${reservation.firstType}"></td>
+            <td th:text="${reservation.firstPrice}"></td>
+        </tr>
+        <tr th:if="${reservation.flightNumberTwo} != 0">
+            <td>Flight Two</td>
+            <td th:text="${planeTwo.departureLocation}"></td>
+            <td th:text="${planeTwo.landingLocation}"></td>
+            <td th:text="${planeTwo.dateDeparture}"></td>
+            <td th:text="${planeTwo.timeDeparture}"></td>
+            <td th:text="${reservation.secondType}"></td>
+            <td th:text="${reservation.secondPrice}"></td>
+        </tr>
     </tbody>
 </table>
-<form th:action="@{/main-page/cancel-reservation}" th:object="${reservation}" method="post">
-    <input type="hidden" th:field="*{pnrCode}">
-    <input type="submit" value="Cancel Reservation">
+<form th:action="@{/main-page/reservation-confirmed}">
+    <input type="radio" name="paymentType" value="Cash" required> Cash
+    <input type="radio" name="paymentType" value="Credit Card" required> Credit Card
+    <br><br>
+    <input type="hidden" id="pnrCode" name="pnrCode" th:value="${reservation.pnrCode}">
+    <input type="submit" th:value="Pay">
+
+
+
 </form>
 </body>
 </html>

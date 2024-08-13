@@ -36,7 +36,6 @@ public class CompanyService implements UserDetailsService {
 
 
 
-
     @Transactional
     public void saveUser(User user) {
         userDAO.save(user);
@@ -49,6 +48,11 @@ public class CompanyService implements UserDetailsService {
     public void savePlane(Plane plane)
     {
         planeDAO.save(plane);
+    }
+
+    public List<UserPNR> getFlyersPNR(String pnr)
+    {
+        return userPNRDAO.findByPNR(pnr);
     }
 
     @Transactional
@@ -75,12 +79,28 @@ public class CompanyService implements UserDetailsService {
         return planes;
     }
 
+    @Transactional
+    public void deleteUserPNR(int id)
+    {
+        userPNRDAO.delete(id);
+    }
     public Plane findById(int id)
     {
         return planeDAO.getPlaneById(id);
     }
 
-//
+
+    @Transactional
+    public void deleteReservation(String id)
+    {
+        reservationDAO.delete(id);
+    }
+
+    @Transactional
+    public void changeReservationStatus(String id)
+    {
+        reservationDAO.changeRes(id);
+    }
 //    @PostConstruct
 //    public void createPlanes(){
 //        Random rand = new Random();
@@ -105,7 +125,7 @@ public class CompanyService implements UserDetailsService {
 //            int economySeatAmount = p.getAvailabeSeats()-businessSeatAmount;
 //            p.setBusinessSeat(businessSeatAmount);
 //            p.setEconomySeat(economySeatAmount);
-//            System.out.println(businessSeatAmount + " " + economySeatAmount);
+//            System.out.println(i + " "+businessSeatAmount + " " + economySeatAmount);
 //            int randHour = rand.nextInt(24);
 //            int randMinute = rand.nextInt(12)*5;
 //            String hour = Integer.toString(randHour);
