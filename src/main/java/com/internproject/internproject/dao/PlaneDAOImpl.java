@@ -23,7 +23,7 @@ public class PlaneDAOImpl implements PlaneDAO{
     @Transactional
     @Override
     public void save(Plane plane) {
-        em.persist(plane);
+        em.merge(plane);
     }
 
     @Override

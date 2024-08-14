@@ -56,7 +56,11 @@ public class MainPageController {
         if (reservation == null)
         {
             reservation = new Reservation();
-            reservation.setPnrCode(generatePNR());
+            String pnr;
+            do {
+                pnr = generatePNR();
+            }while (companyService.findReservation(pnr) != null);
+            reservation.setPnrCode(pnr);
         }
         model.addAttribute("countries", countries);
         model.addAttribute("numbers", numbers);
@@ -123,8 +127,7 @@ public class MainPageController {
     }
 
     @PostMapping("/checkValid")
-    public String checkvalid(
-            @Valid @ModelAttribute("flightInfo") FlightInfo flight, BindingResult theBindingResult, Model model) {
+    public String checkvalid(@Valid @ModelAttribute("flightInfo") FlightInfo flight, BindingResult theBindingResult, Model model) {
 
         flightInfo = flight;
         System.out.println(flightInfo);
@@ -141,12 +144,8 @@ public class MainPageController {
             return "main-page";
         }
 
-       if (theBindingResult.hasErrors())
-       {
-           return "redirect:/main-page/home";
-       }else{
+
            return "redirect:/main-page/searchplane";
-       }
     }
 
 
@@ -214,24 +213,15 @@ public class MainPageController {
         String[] types = new String[30];
 
         for (int i = 0; i < flightInfo.getAdult(); i++) {
-            count++;
-            UserPNR user = new UserPNR();
-            types[count] = "Adult";
-            users.add(user);
+            users.add(new UserPNR());
         }
 
         for (int i = 0; i < flightInfo.getChild(); i++) {
-            count++;
-            types[count] = "Child";
-            UserPNR user = new UserPNR();
-            users.add(user);
+            users.add(new UserPNR());
         }
 
         for (int i = 0; i < flightInfo.getInfant(); i++) {
-            count++;
-            UserPNR user = new UserPNR();
-            types[count] = "Infant";
-            users.add(user);
+            users.add(new UserPNR());
         }
         model.addAttribute("adult", flightInfo.getAdult());
         model.addAttribute("child", flightInfo.getChild());
@@ -310,12 +300,57 @@ public class MainPageController {
 
         return "payment";
     }
+    @RequestMapping("/add-user")
+    public String addUser(@RequestParam("username") String username, @RequestParam("password") String password, @RequestParam("confirmPassword") String confirmPassword,  RedirectAttributes redirectAttributes,Model model)
+    {
+        System.out.println(username);
+        System.out.println(password);
+        System.out.println(confirmPassword);
+        if (!password.equals(confirmPassword))
+        {
+            redirectAttributes.addFlashAttribute("error", "Password does not match");
+        }else if (companyService.findUserByUsername(username) != null)
+        {
+            redirectAttributes.addFlashAttribute("error", "Username already exists");
+        }else{
+            User user = new User();
+            user.setUsername(username);
+            password = "{noop}"+password;
+            user.setPassword(password);
+            companyService.saveUser(user);
+            redirectAttributes.addFlashAttribute("error", "User added successfully");
+        }
+        return "redirect:/main-page/user-management";
+    }
 
-
+    @RequestMapping("/delete-user")
+    public String delete(@RequestParam("delUsername") String username, RedirectAttributes redirectAttributes)
+    {
+        User user = companyService.findUserByUsername(username);
+        if (user == null)
+        {
+            redirectAttributes.addFlashAttribute("error1", "User not found");
+        }else{
+            companyService.deleteUser(username);
+            redirectAttributes.addFlashAttribute("error1", "User deleted successfully");
+        }
+        return "redirect:/main-page/user-management";
+    }
+    @RequestMapping("/user-management")
+    public String userManagement(Model model)
+    {
+        return "user-management";
+    }
     @RequestMapping("/reservation-confirmed")
     public String reservationConfirmed(@RequestParam("pnrCode") String pnr, Model model)
     {
         companyService.changeReservationStatus(pnr);
+        Plane p1 = companyService.findById(reservation.getFlightNumberOne());
+        companyService.reduceSeat(p1, users.size(), reservation.getFirstType());
+        if (reservation.getFlightNumberTwo() != 0) {
+            Plane p2 = companyService.findById(reservation.getFlightNumberTwo());
+            companyService.reduceSeat(p2, users.size(), reservation.getSecondType());
+        }
         model.addAttribute("reservation", reservation);
         model.addAttribute("users", users);
         model.addAttribute("planeOne", companyService.findById(reservation.getFlightNumberOne()));
@@ -335,7 +370,6 @@ public class MainPageController {
     public String findPNRReservation(@RequestParam("pnrCode") String pnr, RedirectAttributes redirectAttributes, Model model) {
         System.out.println(pnr);
         if (companyService.findReservation(pnr) == null) {
-            // Add the error message to the redirect attributes
             redirectAttributes.addFlashAttribute("error", "No reservation found");
             return "redirect:/main-page/find-reservation";
         }
@@ -351,11 +385,27 @@ public class MainPageController {
     public String cancelReservation(@RequestParam("pnrCode") String pnr, RedirectAttributes redirectAttributes) {
         Reservation reservation = companyService.findReservation(pnr);
         List<UserPNR> users = companyService.getFlyersPNR(pnr);
+        Plane p1 = companyService.findById(reservation.getFlightNumberOne());
+        companyService.increaseSeat(p1, users.size(), reservation.getFirstType());
+        if(reservation.getFlightNumberTwo() != 0)
+        {
+            Plane p2 = companyService.findById(reservation.getFlightNumberTwo());
+            companyService.increaseSeat(p2, users.size(), reservation.getSecondType());
+        }
         for (UserPNR user: users)
         {
             companyService.deleteUserPNR(user.getId());
         }
         companyService.deleteReservation(pnr);
+        return "redirect:/main-page/home";
+    }
+
+    @RequestMapping("/reset-everything")
+    public String resetEverything()
+    {
+        reservation = null;
+        flightInfo = null;
+        users = null;
         return "redirect:/main-page/home";
     }
 

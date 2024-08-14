@@ -19,7 +19,7 @@ public class NavigationController {
 
     @RequestMapping("/section3")
     public String showSection3() {
-        return "redirect:/main-page/section3";
+        return "redirect:/main-page/user-management";
     }
 
 }

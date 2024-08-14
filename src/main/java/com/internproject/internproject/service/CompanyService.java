@@ -56,6 +56,12 @@ public class CompanyService implements UserDetailsService {
     }
 
     @Transactional
+    public void deleteUser(String username)
+    {
+        userDAO.deleteByUsername(username);
+    }
+
+    @Transactional
     public void saveReservation(Reservation reservation)
     {
         reservationDAO.save(reservation);
@@ -96,16 +102,43 @@ public class CompanyService implements UserDetailsService {
         reservationDAO.delete(id);
     }
 
+    public void reduceSeat(Plane p, int seatAmount, String seatType)
+    {
+        if (seatType.equals("Business"))
+        {
+            p.setBusinessSeat(p.getBusinessSeat()-seatAmount);
+        }else if (seatType.equals("Economy"))
+        {
+            p.setEconomySeat(p.getEconomySeat()-seatAmount);
+        }
+        p.setAvailabeSeats(p.getAvailabeSeats()-seatAmount);
+        planeDAO.save(p);
+    }
+
+    public void increaseSeat(Plane p, int seatAmount, String seatType)
+    {
+        if (seatType.equals("Business"))
+        {
+            p.setBusinessSeat(p.getBusinessSeat()+seatAmount);
+        }else if (seatType.equals("Economy"))
+        {
+            p.setEconomySeat(p.getEconomySeat()+seatAmount);
+        }
+        p.setAvailabeSeats(p.getAvailabeSeats()+seatAmount);
+        planeDAO.save(p);
+    }
+
     @Transactional
     public void changeReservationStatus(String id)
     {
         reservationDAO.changeRes(id);
     }
+//
 //    @PostConstruct
 //    public void createPlanes(){
 //        Random rand = new Random();
-//        String[] locations = new String[]{"Ankara","Istanbul"};
-//        for (int i = 0; i < 1000; i++) {
+//        String[] locations = new String[]{"Ankara","Istanbul","Konya","Izmir","Antalya","Adana","Trabzon","Samsun","Erzurum","Van"};
+//        for (int i = 0; i < 10000; i++) {
 //            Plane p = new Plane();
 //            int randNum = rand.nextInt(locations.length);
 //            p.setDepartureLocation(locations[randNum]);
@@ -114,7 +147,7 @@ public class CompanyService implements UserDetailsService {
 //                randNum2 = rand.nextInt(locations.length);
 //            }while (randNum == randNum2);
 //            p.setLandingLocation(locations[randNum2]);
-//            int randMonth = rand.nextInt(8,12);
+//            int randMonth = rand.nextInt(7,12);
 //            int randDay = rand.nextInt(30);
 //            Date d = new Date(124, randMonth, randDay);
 //            p.setDateDeparture(d);
@@ -125,7 +158,7 @@ public class CompanyService implements UserDetailsService {
 //            int economySeatAmount = p.getAvailabeSeats()-businessSeatAmount;
 //            p.setBusinessSeat(businessSeatAmount);
 //            p.setEconomySeat(economySeatAmount);
-//            System.out.println(i + " "+businessSeatAmount + " " + economySeatAmount);
+//            System.out.println(i + ". "+locations[randNum]+"-"+locations[randNum2]);
 //            int randHour = rand.nextInt(24);
 //            int randMinute = rand.nextInt(12)*5;
 //            String hour = Integer.toString(randHour);

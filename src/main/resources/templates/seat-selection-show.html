@@ -2,70 +2,123 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Seat Selection</title>
-</head>
-<head>
-    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Flight Prices</title>
+    <title>Seat Selection</title>
     <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 24px;
+        }
+
         table {
             width: 100%;
             border-collapse: collapse;
+            margin-bottom: 20px;
         }
+
         th, td {
-            border: 1px solid black;
-            padding: 8px;
+            border: 1px solid #ddd;
+            padding: 12px;
             text-align: center;
+            font-size: 16px;
         }
+
         th {
-            background-color: #f2f2f2;
+            background-color: #4CAF50;
+            color: white;
         }
+
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+
         caption {
             font-size: 1.5em;
-            margin: 10px 0;
+            margin: 20px 0;
+            font-weight: bold;
+        }
+
+        input[type="radio"] {
+            transform: scale(1.2);
+            margin: 0 10px;
+        }
+
+        .submit-button {
+            display: block;
+            width: 100%;
+            background-color: #4CAF50;
+            color: white;
+            padding: 15px;
+            font-size: 18px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .submit-button:hover {
+            background-color: #45a049;
         }
     </style>
 </head>
 <body>
-<form th:action="@{/main-page/passenger-info}" th:object="${reservation}" method="post">
-<table>
-    <caption>Flight Prices</caption>
-    <thead>
-    <tr>
-        <th>Flight Type</th>
-        <th>Economy Price</th>
-        <th>Business Price</th>
-        <th>Economy Seat Available</th>
-        <th>Business Seat Available</th>
-        <th>Economy</th>
-        <th>Business</th>
-    </tr>
-    </thead>
-    <tbody>
-    <tr>
-        <td>Going</td>
-        <td th:text=" ${flightOne.economyPrice}"></td> <!-- Replace with actual economy price for going flight -->
-        <td th:text="${flightOne.bussinessPrice}"></td>
-        <td th:text="${flightOne.economySeat}"></td>
-        <td th:text="${flightOne.businessSeat}"></td>
-        <td><input type="radio" name="goFlight" th:field="${reservation.firstType}" th:value="Economy" required></td>
-        <td><input type="radio" name="goFlight" th:field="${reservation.firstType}" th:value="Business" required></td>
-        <!-- Replace with actual business price for going flight -->
-    </tr>
-    <tr th:if="${isRoundTrip}">
-        <td>Returning</td>
-        <td th:text="${flightTwo.economyPrice}"></td>
-        <td th:text="${flightTwo.bussinessPrice}"></td>
-        <td th:text="${flightTwo.economySeat}"></td>
-        <td th:text="${flightTwo.businessSeat}"></td>
-        <td><input type="radio" name="returnFlight" th:field="${reservation.secondType}" th:value="'Economy'" required></td>
-        <td><input type="radio" name="returnFlight" th:field="${reservation.secondType}" th:value="'Business'" required></td>
-    </tr>
-    </tbody>
-</table>
-
-    <input type="submit" th:value="Save">
-</form>
+<div class="container">
+    <h1>Seat Selection</h1>
+    <form th:action="@{/main-page/passenger-info}" th:object="${reservation}" method="post">
+        <table>
+            <caption>Flight Prices</caption>
+            <thead>
+            <tr>
+                <th>Flight Type</th>
+                <th>Economy Price</th>
+                <th>Business Price</th>
+                <th>Economy Seats Available</th>
+                <th>Business Seats Available</th>
+                <th>Select Economy</th>
+                <th>Select Business</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+                <td>Going</td>
+                <td th:text="${flightOne.economyPrice}"></td>
+                <td th:text="${flightOne.bussinessPrice}"></td>
+                <td th:text="${flightOne.economySeat}"></td>
+                <td th:text="${flightOne.businessSeat}"></td>
+                <td><input type="radio" name="goFlight" th:field="${reservation.firstType}" th:value="Economy" required></td>
+                <td><input type="radio" name="goFlight" th:field="${reservation.firstType}" th:value="Business" required></td>
+            </tr>
+            <tr th:if="${isRoundTrip}">
+                <td>Returning</td>
+                <td th:text="${flightTwo.economyPrice}"></td>
+                <td th:text="${flightTwo.bussinessPrice}"></td>
+                <td th:text="${flightTwo.economySeat}"></td>
+                <td th:text="${flightTwo.businessSeat}"></td>
+                <td><input type="radio" name="returnFlight" th:field="${reservation.secondType}" th:value="Economy" required></td>
+                <td><input type="radio" name="returnFlight" th:field="${reservation.secondType}" th:value="Business" required></td>
+            </tr>
+            </tbody>
+        </table>
+        <input type="submit" class="submit-button" th:value="Save">
+    </form>
+</div>
 </body>
 </html>

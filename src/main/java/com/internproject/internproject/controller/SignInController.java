@@ -31,7 +31,9 @@ public class SignInController {
 
     @PostMapping("/creatingAccount")
     public String createAccount(@Valid @ModelAttribute("webUser") WebUser theUser, BindingResult bindingResult) {
-
+        if (companyService.findUserByUsername(theUser.getUsername()) != null) {
+            bindingResult.rejectValue("username", "error.webUser", "An account already exists for this username.");
+        }
         if (bindingResult.hasErrors()) {
             return "create-account";
         }

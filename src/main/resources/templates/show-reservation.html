@@ -41,7 +41,7 @@
     </thead>
     <tbody>
     <tr th:each="user : ${users}">
-        <td th:text="Passenger + ' ' + ${userStat.count}"></td>
+        <td th:text="${user.personType}"></td>
         <td th:text="${user.name}"></td>
         <td th:text="${user.surname}"></td>
         <td th:text="${user.birthDate}"></td>

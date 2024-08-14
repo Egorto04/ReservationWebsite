@@ -10,22 +10,64 @@
             font-family: Arial, sans-serif;
             background-color: #f4f4f4;
             margin: 0;
-            padding: 20px;
+            padding: 0;
             color: #333;
+            display: flex;
+        }
+
+        .sidebar {
+            width: 250px;
+            background-color: #333;
+            color: #fff;
+            height: 100vh;
+            position: fixed;
+            top: 0;
+            left: 0;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        .sidebar h2 {
+            color: #fff;
+        }
+
+        .sidebar a {
+            color: #fff;
+            display: block;
+            padding: 10px;
+            text-decoration: none;
+            margin-bottom: 10px;
+            border-radius: 4px;
+        }
+
+        .sidebar a:hover {
+            background-color: #575757;
+        }
+
+        .main-content {
+            flex-grow: 1;
+            margin-left: 250px; /* same as the width of the sidebar */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            box-sizing: border-box;
         }
 
         .container {
             max-width: 600px;
-            margin: 0 auto;
+            width: 100%;
             padding: 20px;
             background-color: #fff;
             border-radius: 8px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            box-sizing: border-box;
         }
 
         h1 {
             text-align: center;
             color: #333;
+            margin-bottom: 20px;
         }
 
         label {
@@ -42,6 +84,7 @@
             margin-bottom: 12px;
             border: 1px solid #ccc;
             border-radius: 4px;
+            box-sizing: border-box;
         }
 
         .radio-group {
@@ -116,49 +159,6 @@
             margin-top: -10px;
             margin-bottom: 10px;
         }
-        .sidebar {
-            width: 250px;
-            background-color: #333;
-            color: white;
-            padding: 20px;
-            box-sizing: border-box;
-            height: 100vh;
-            position: fixed;
-            top: 0;
-            left: 0;
-        }
-
-
-        .sidebar h2 {
-            color: white;
-        }
-
-        .sidebar a {
-            color: white;
-            display: block;
-            padding: 10px;
-            text-decoration: none;
-            margin-bottom: 10px;
-        }
-
-        .sidebar a:hover {
-            background-color: #575757;
-        }
-        .toggle-btn {
-            position: fixed;
-            top: 20px;
-            left: 260px;
-            background-color: #333;
-            color: white;
-            border: none;
-            padding: 10px;
-            cursor: pointer;
-            transition: left 0.3s ease;
-        }
-
-        .toggle-btn.sidebar-closed {
-            left: 70px;
-        }
     </style>
     <script>
         function setMinDepartureDate() {
@@ -198,6 +198,18 @@
             }
         }
 
+        function disappearArrivalDate()
+        {
+            if (document.getElementById("one_way").checked)
+            {
+                document.getElementById("arrivalDateDiv").style.display = "none";
+            }
+            else
+            {
+                document.getElementById("arrivalDateDiv").style.display = "block";
+            }
+        }
+
         window.onload = function() {
             setMinDepartureDate();
 
@@ -212,6 +224,10 @@
 
             // Add event listener to departure dropdown
             document.getElementById("departure").addEventListener("change", updateLandingOptions);
+
+            // Add event listener to radio buttons
+            document.getElementById("one_way").addEventListener("change", disappearArrivalDate);
+            document.getElementById("roundtrip").addEventListener("change", disappearArrivalDate);
 
             // Add event listener to submit button
             document.querySelector("input[type='submit']").addEventListener("click", function(event) {
@@ -244,17 +260,6 @@
             });
         };
     </script>
-    <script>
-        document.getElementById("toggle-btn").addEventListener("click", function() {
-            var sidebar = document.getElementById("sidebar");
-            var mainContent = document.getElementById("main-content");
-            var toggleBtn = document.getElementById("toggle-btn");
-
-            sidebar.classList.toggle("close");
-            mainContent.classList.toggle("sidebar-closed");
-            toggleBtn.classList.toggle("sidebar-closed");
-        });
-    </script>
 </head>
 <body>
 <div class="sidebar">
@@ -263,75 +268,75 @@
     <a href="/section2" th:href="@{/section2}">Reservations</a>
     <a href="/section3" th:href="@{/section3}">Payment</a>
 </div>
-<button class="toggle-btn" id="toggle-btn">☰</button>
-<div class="container" id="main-content">
-    <h1>Search Plane</h1>
-    <p>User: <span sec:authentication="principal.username"></span></p>
 
-    <form action="#" th:action="@{/main-page/checkValid}" th:object="${flight}" method="post">
-        <div th:if="${error}" class="error-message" th:text="${error}"></div>
-        <div class="radio-group">
-            <input type="radio" id="one_way" name="choice" th:field="*{direction}" value="One-Way" required>
-            <label for="one_way">One-Way</label>
+<div class="main-content" id="main-content">
+    <div class="container">
+        <h1>Search Plane</h1>
+        <p>User: <span sec:authentication="principal.username"></span></p>
 
-            <input type="radio" id="roundtrip" name="choice" th:field="*{direction}" value="Roundtrip" required>
-            <label for="roundtrip">Roundtrip</label>
-        </div>
+        <form action="#" th:action="@{/main-page/checkValid}" th:object="${flight}" method="post">
+            <div th:if="${error}" class="error-message" th:text="${error}"></div>
+            <div class="radio-group">
+                <input type="radio" id="one_way" name="choice" th:field="*{direction}" value="One-Way" required>
+                <label for="one_way">One-Way</label>
 
-        <div class="form-group">
-            <label for="departure">Departure</label>
-            <select id="departure" th:field="*{departure}">
-                <option th:each="cont: ${countries}" th:value="${cont}" th:text="${cont}"></option>
-            </select>
-        </div>
+                <input type="radio" id="roundtrip" name="choice" th:field="*{direction}" value="Roundtrip" required>
+                <label for="roundtrip">Roundtrip</label>
+            </div>
 
-        <div class="form-group">
-            <label for="landing">Landing</label>
-            <select id="landing" th:field="*{landing}">
-                <option th:each="cont: ${countries}" th:value="${cont}" th:text="${cont}"></option>
-            </select>
-        </div>
+            <div class="form-group">
+                <label for="departure">Departure</label>
+                <select id="departure" th:field="*{departure}">
+                    <option th:each="cont: ${countries}" th:value="${cont}" th:text="${cont}"></option>
+                </select>
+            </div>
 
-        <div class="form-group">
-            <label for="departureDate">Departure Date</label>
-            <input type="date" id="departureDate" th:field="*{departureDate}" />
-            <div th:if="${#fields.hasErrors('departureDate')}" class="error-message" th:errors="*{departureDate}"></div>
-        </div>
+            <div class="form-group">
+                <label for="landing">Landing</label>
+                <select id="landing" th:field="*{landing}">
+                    <option th:each="cont: ${countries}" th:value="${cont}" th:text="${cont}"></option>
+                </select>
+            </div>
 
-        <div class="form-group">
-            <label for="arrivalDate">Arrival Date</label>
-            <input type="date" id="arrivalDate" th:field="*{arrivalDate}" />
-            <div th:if="${#fields.hasErrors('arrivalDate')}" class="error-message" th:errors="*{arrivalDate}"></div>
-        </div>
+            <div class="form-group">
+                <label for="departureDate">Departure Date</label>
+                <input type="date" id="departureDate" th:field="*{departureDate}" required/>
+            </div>
 
-        <div class="form-group">
-            <label for="adult">Adult Number</label>
-            <select id="adult" th:field="*{adult}" required>
-                <option th:each="num: ${numbers}" th:value="${num}" th:text="${num}"></option>
-            </select>
-        </div>
+            <div class="form-group" id="arrivalDateDiv">
+                <label for="arrivalDate">Arrival Date</label>
+                <input type="date" id="arrivalDate" th:field="*{arrivalDate}" />
+            </div>
 
-        <div class="form-group">
-            <label for="child">Child Number</label>
-            <select id="child" th:field="*{child}">
-                <option th:each="num: ${numbers}" th:value="${num}" th:text="${num}"></option>
-            </select>
-        </div>
+            <div class="form-group">
+                <label for="adult">Adult Number</label>
+                <select id="adult" th:field="*{adult}" required>
+                    <option th:each="num: ${numbers}" th:value="${num}" th:text="${num}"></option>
+                </select>
+            </div>
 
-        <div class="form-group">
-            <label for="infant">Infant Number</label>
-            <select id="infant" th:field="*{infant}">
-                <option th:each="num: ${numbers}" th:value="${num}" th:text="${num}"></option>
-            </select>
-        </div>
+            <div class="form-group">
+                <label for="child">Child Number</label>
+                <select id="child" th:field="*{child}">
+                    <option th:each="num: ${numbers}" th:value="${num}" th:text="${num}"></option>
+                </select>
+            </div>
 
-        <input type="submit" value="Search">
-    </form>
+            <div class="form-group">
+                <label for="infant">Infant Number</label>
+                <select id="infant" th:field="*{infant}">
+                    <option th:each="num: ${numbers}" th:value="${num}" th:text="${num}"></option>
+                </select>
+            </div>
 
-    <div class="logout-form">
-        <form action="#" th:action="@{/logout}" method="post">
-            <input type="submit" value="Logout">
+            <input type="submit" value="Search">
         </form>
+
+        <div class="logout-form">
+            <form action="#" th:action="@{/logout}" method="post">
+                <input type="submit" value="Logout">
+            </form>
+        </div>
     </div>
 </div>
 

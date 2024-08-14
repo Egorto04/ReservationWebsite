@@ -62,4 +62,9 @@ public class UserDAOImpl implements UserDAO{
 
     }
 
+    @Override
+    public void deleteByUsername(String username) {
+        em.createQuery("delete from User where username = :username").setParameter("username", username).executeUpdate();
+    }
+
 }
