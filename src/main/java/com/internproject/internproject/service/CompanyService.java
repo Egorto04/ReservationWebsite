@@ -133,7 +133,7 @@ public class CompanyService implements UserDetailsService {
     {
         reservationDAO.changeRes(id);
     }
-
+//
 //    @PostConstruct
 //    public void createPlanes(){
 //        Random rand = new Random();

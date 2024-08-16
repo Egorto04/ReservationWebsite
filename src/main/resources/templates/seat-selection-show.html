@@ -80,6 +80,19 @@
             display: none;
         }
 
+        .disabled label{
+            color: #aaa;
+            cursor: not-allowed;
+        }
+        .disabled label:before {
+            background-color: #ddd; /* Change background color of the radio button */
+            border-color: #bbb; /* Change border color of the radio button */
+        }
+
+        .radio-group input[type="radio"]:disabled + label:before {
+            background-color: #ddd; /* Ensure radio button remains styled when disabled */
+            border-color: #bbb; /* Ensure border remains styled when disabled */
+        }
         .radio-group input[type="radio"] + label:before {
             content: "";
             display: inline-block;
@@ -120,10 +133,56 @@
             transform: scale(1.02);
         }
     </style>
+    <script>
+        function checkAvailability(){
+            var firstBusSeatElem = document.getElementById("firstbusseat");
+            var secondBusSeatElem = document.getElementById("secondbusseat");
+            var firstEcoSeatElem = document.getElementById("firstecoseat");
+            var secondEcoSeatElem = document.getElementById("secondecoseat");
+
+            if (firstBusSeatElem && secondBusSeatElem && firstEcoSeatElem && secondEcoSeatElem) {
+                var firstBusSeat = parseInt(firstBusSeatElem.value, 10);
+                var secondBusSeat = parseInt(secondBusSeatElem.value, 10);
+                var firstEcoSeat = parseInt(firstEcoSeatElem.value, 10);
+                var secondEcoSeat = parseInt(secondEcoSeatElem.value, 10);
+
+                if (firstBusSeat === 0) {
+                    var goFlightBusiness = document.getElementById("goFlightBusiness");
+                    goFlightBusiness.disabled = true;
+                    goFlightBusiness.parentElement.classList.add("disabled");
+                }
+                if (secondBusSeat === 0) {
+                    var returnFlightBusiness = document.getElementById("returnFlightBusiness");
+                    returnFlightBusiness.disabled = true;
+                    returnFlightBusiness.parentElement.classList.add("disabled");
+                }
+
+                if (firstEcoSeat === 0) {
+                    var goFlightEconomy = document.getElementById("goFlightEconomy");
+                    goFlightEconomy.disabled = true;
+                    goFlightEconomy.parentElement.classList.add("disabled");
+                }
+                if (secondEcoSeat === 0) {
+                    var returnFlightEconomy = document.getElementById("returnFlightEconomy");
+                    returnFlightEconomy.disabled = true;
+                    returnFlightEconomy.parentElement.classList.add("disabled");
+                }
+            } else {
+                console.error("One or more seat elements are missing.");
+            }
+        }
+
+        window.onload = checkAvailability;
+
+    </script>
 </head>
 <body>
 <div class="container">
     <h1>Seat Selection</h1>
+    <input type="hidden" id="firstbusseat" th:value="${flightOne.businessSeat}">
+    <input type="hidden" id="secondbusseat" th:value="${flightTwo.businessSeat}">
+    <input type="hidden" id="firstecoseat" th:value="${flightOne.economySeat}">
+    <input type="hidden" id="secondecoseat" th:value="${flightTwo.economySeat}">
     <form th:action="@{/main-page/passenger-info}" th:object="${reservation}" method="post">
         <table>
             <caption>Flight Prices</caption>

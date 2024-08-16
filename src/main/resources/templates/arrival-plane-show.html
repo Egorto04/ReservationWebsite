@@ -8,19 +8,19 @@
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #f4f4f4;
+            background-color: #ecf0f1;
             margin: 0;
             padding: 20px;
+            overflow-x: hidden;
         }
 
         .container {
             max-width: 900px;
             margin: 0 auto;
-            padding: 30px;
+            padding: 40px;
             background-color: #ffffff;
-            border-radius: 12px;
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-            box-sizing: border-box;
+            border-radius: 12px;
             opacity: 0;
             transform: translateY(20px);
             animation: fadeInUp 0.6s ease forwards;
@@ -30,18 +30,25 @@
             border: 1px solid #ddd;
             padding: 20px;
             margin-bottom: 20px;
-            border-radius: 8px;
+            border-radius: 12px;
             background-color: #fafafa;
             opacity: 0;
             transform: scale(0.95);
             animation: fadeInScale 0.6s ease forwards;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .plane-details:hover {
+            transform: scale(1.02);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
         }
 
         .plane-details h2 {
             margin-top: 0;
-            color: #333;
-            font-size: 24px;
-            border-bottom: 2px solid #4CAF50;
+            color: #2c3e50;
+            font-size: 26px;
+            border-bottom: 2px solid #3498db;
             padding-bottom: 10px;
             margin-bottom: 20px;
         }
@@ -50,14 +57,15 @@
             font-size: 16px;
             margin: 10px 0;
             line-height: 1.6;
+            color: #34495e;
         }
 
         .plane-details p strong {
-            color: #555;
+            color: #2c3e50;
         }
 
         .plane-details span {
-            color: #000;
+            color: #2c3e50;
         }
 
         .plane-details input[type="submit"] {
@@ -65,7 +73,7 @@
             padding: 12px 24px;
             font-size: 16px;
             color: #ffffff;
-            background-color: #4CAF50;
+            background-color: #3498db;
             border: none;
             border-radius: 6px;
             cursor: pointer;
@@ -75,14 +83,14 @@
         }
 
         .plane-details input[type="submit"]:hover {
-            background-color: #45a049;
-            transform: scale(1.02);
+            background-color: #2980b9;
+            transform: scale(1.05);
         }
 
         .header {
             text-align: center;
             margin-bottom: 40px;
-            font-size: 32px;
+            font-size: 36px;
             color: #2c3e50;
             opacity: 0;
             animation: fadeInDown 0.6s ease forwards;
@@ -120,27 +128,40 @@
                 transform: scale(1);
             }
         }
+
+        .error-message {
+            color: #e74c3c; /* Red color for the error text */
+            font-size: 18px;
+            text-align: center;
+            margin-bottom: 20px;
+            font-weight: bold;
+            animation: fadeIn 0.6s ease forwards;
+        }
+
     </style>
 </head>
 <body>
 <h2 class="header">Returning Planes</h2>
-<div th:each="plane : ${planes}">
-    <form class="container" th:action="@{/main-page/processarrival}" th:object="${plane}" method="post">
-        <div class="plane-details">
-            <h2>Plane Details</h2>
-            <p><strong>Departure Location:</strong> <span th:text="${plane.departureLocation}">Departure Location</span></p>
-            <p><strong>Landing Location:</strong> <span th:text="${plane.landingLocation}">Landing Location</span></p>
-            <p><strong>Date Departure:</strong> <span th:text="${#dates.format(plane.dateDeparture, 'yyyy-MM-dd')}">Date Departure</span></p>
-            <p><strong>Time Departure:</strong> <span th:text="${plane.timeDeparture}">Time Departure</span></p>
-            <p><strong>Available Seats:</strong> <span th:text="${plane.availabeSeats}">Available Seats</span></p>
-            <p><strong>Economy Price:</strong> <span th:text="${plane.economyPrice} + '$'">Economy Price</span></p>
-            <p><strong>Business Price:</strong> <span th:text="${plane.bussinessPrice} + '$'">Business Price</span></p>
-            <p><strong>Economy Seats Available:</strong> <span th:text="${plane.economySeat}">Economy Seats</span></p>
-            <p><strong>Business Seats Available:</strong> <span th:text="${plane.businessSeat}">Business Seats</span></p>
-            <input type="hidden" name="planeId" th:value="*{flightId}">
-            <input type="submit" th:value="Select">
-        </div>
-    </form>
+<div class="container">
+    <div th:each="plane : ${planes}">
+        <form th:action="@{/main-page/processarrival}" th:object="${plane}" method="post">
+            <div class="plane-details">
+                <h2>Plane Details</h2>
+                <p><strong>Departure Location:</strong> <span th:text="${plane.departureLocation}">Departure Location</span></p>
+                <p><strong>Landing Location:</strong> <span th:text="${plane.landingLocation}">Landing Location</span></p>
+                <p><strong>Date Departure:</strong> <span th:text="${#dates.format(plane.dateDeparture, 'yyyy-MM-dd')}">Date Departure</span></p>
+                <p><strong>Time Departure:</strong> <span th:text="${plane.timeDeparture}">Time Departure</span></p>
+                <p><strong>Available Seats:</strong> <span th:text="${plane.availabeSeats}">Available Seats</span></p>
+                <p><strong>Economy Price:</strong> <span th:text="${plane.economyPrice} + '$'">Economy Price</span></p>
+                <p><strong>Business Price:</strong> <span th:text="${plane.bussinessPrice} + '$'">Business Price</span></p>
+                <p><strong>Economy Seats Available:</strong> <span th:text="${plane.economySeat}">Economy Seats</span></p>
+                <p><strong>Business Seats Available:</strong> <span th:text="${plane.businessSeat}">Business Seats</span></p>
+                <input type="hidden" name="planeId" th:value="*{flightId}">
+                <input type="submit" th:value="Select">
+            </div>
+        </form>
+    </div>
 </div>
+
 </body>
 </html>

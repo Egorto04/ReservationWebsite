@@ -21,5 +21,9 @@ public class NavigationController {
     public String showSection3() {
         return "redirect:/main-page/user-management";
     }
+    @RequestMapping("/section4")
+    public String showSection4() {
+        return "redirect:/main-page/help";
+    }
 
 }

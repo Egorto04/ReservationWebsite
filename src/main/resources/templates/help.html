@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Help Page - FAQ</title>
+
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+            color: #333;
+            display: flex;
+        }
+
+        .sidebar {
+            width: 250px;
+            background-color: #2c3e50;
+            color: #ecf0f1;
+            height: 100vh;
+            position: fixed;
+            top: 0;
+            left: 0;
+            padding: 20px;
+            box-sizing: border-box;
+            transition: background-color 0.3s ease;
+        }
+
+        .sidebar h2 {
+            color: #ecf0f1;
+            font-weight: 600;
+            margin-bottom: 30px;
+        }
+
+        .sidebar a {
+            color: #ecf0f1;
+            display: block;
+            padding: 12px;
+            text-decoration: none;
+            margin-bottom: 15px;
+            border-radius: 6px;
+            transition: background-color 0.3s ease;
+        }
+
+        .sidebar a:hover {
+            background-color: #34495e;
+        }
+
+        .content {
+            margin-left: 270px;
+            padding: 20px;
+            box-sizing: border-box;
+            width: calc(100% - 270px);
+        }
+
+        .content h1 {
+            font-size: 2rem;
+            margin-bottom: 20px;
+        }
+
+        .faq {
+            margin-bottom: 20px;
+        }
+
+        .faq h3 {
+            font-size: 1.5rem;
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+
+        .faq p {
+            margin: 0 0 10px;
+            padding: 0;
+        }
+
+        .faq a {
+            margin: 0 0 10px;
+            padding: 0;
+        }
+
+        .faq-item {
+            margin-bottom: 20px;
+        }
+
+        .faq-item h3 {
+            cursor: pointer;
+        }
+
+        .faq-item p {
+            display: none;
+            transition: max-height 0.3s ease;
+        }
+        .faq-item a {
+            display: none;
+            transition: max-height 0.3s ease;
+        }
+
+        .faq-item.active p {
+            display: block;
+        }
+        .faq-item.active a {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+<div class="sidebar">
+    <h2>Menu</h2>
+    <a href="/section1" th:href="@{/section1}">Search Plane</a>
+    <a href="/section2" th:href="@{/section2}">Reservations</a>
+    <a href="/section3" th:href="@{/section3}">User Management</a>
+    <a href="/section4" th:href="@{/section4}">Help</a>
+</div>
+
+<div class="content">
+    <h1>Frequently Asked Questions</h1>
+
+    <div class="faq">
+        <div class="faq-item">
+            <h3>How do I search for a plane?</h3>
+            <p>You can search for a plane by navigating to the 'Search Plane' section in the menu. Enter the plane's departure location or other relevant details to begin your search.</p>
+        </div>
+        <div class="faq-item">
+            <h3>How can I make a reservation?</h3>
+            <p>You can make your reservation through the 'Search Plane' section</p>
+        </div>
+        <div class="faq-item">
+            <h3>How do I manage users?</h3>
+            <p>To manage users, go to the 'User Management' section. You can add or remove users from the system as needed.</p>
+        </div>
+        <div class="faq-item">
+            <h3>Who can I contact for further assistance?</h3>
+            <p>If you need further assistance, please reach out to our support team via the 'Contact Us' page, or email us at support@example.com.</p>
+        </div>
+        <div class="faq-item">
+            <h3>How do I make payment if I had not done it yet</h3>
+            <p>If you had problems with the payment </p>
+            <a href="/main-page/payment-search">click here</a>
+            <p>. This site will direct you to the payment confirmation</p>
+        </div>
+
+    </div>
+</div>
+
+<script>
+    document.querySelectorAll('.faq-item h3').forEach(item => {
+        item.addEventListener('click', () => {
+            const parent = item.parentNode;
+            parent.classList.toggle('active');
+        });
+    });
+</script>
+</body>
+</html>

@@ -72,18 +72,18 @@ public class MainPageController {
         return "main-page";
     }
     @RequestMapping("/searchplane")
-    public String searchPlane( Model model) {
+    public String searchPlane( Model model,  @ModelAttribute("error") String error) {
         List<Plane> planes = companyService.findPlane(flightInfo.getDeparture(),flightInfo.getLanding(),flightInfo.getDepartureDate());
         model.addAttribute("planes", planes);
-
+        model.addAttribute("error", error);
         int adult = flightInfo.getInfant();
         model.addAttribute("flight", flightInfo);
         return "departure-plane-show";
     }
 
-    @PostMapping("/processdeparture")
+    @RequestMapping("/processdeparture")
     public String processDeparture(@RequestParam("planeId") int planeId,
-                                   Model model)  {
+                                   Model model, RedirectAttributes redirectAttributes)  {
         Plane p = companyService.findById(planeId);
         reservation.setFlightNumberOne(planeId);
         reservation.setFlightNumberTwo(0);
@@ -126,20 +126,73 @@ public class MainPageController {
         flightInfo = flight;
 
         List<Plane> planes = companyService.findPlane(flightInfo.getDeparture(),flightInfo.getLanding(),flightInfo.getDepartureDate());
+
         if (planes.isEmpty())
         {
             redirectAttributes.addFlashAttribute("countries", countries);
             redirectAttributes.addFlashAttribute("numbers", numbers);
             redirectAttributes.addFlashAttribute("flight", new FlightInfo());
-            redirectAttributes.addFlashAttribute("error", "No flight found");
+            redirectAttributes.addFlashAttribute("error", "No flight for going");
             return "redirect:/main-page/home";
         }
-
+        if (flightInfo.getDirection().equals("Roundtrip"))
+        {
+            List<Plane> planes2 = companyService.findPlane(flightInfo.getLanding(),flightInfo.getDeparture(),flightInfo.getArrivalDate());
+            if (planes2.isEmpty())
+            {
+                redirectAttributes.addFlashAttribute("countries", countries);
+                redirectAttributes.addFlashAttribute("numbers", numbers);
+                redirectAttributes.addFlashAttribute("flight", new FlightInfo());
+                redirectAttributes.addFlashAttribute("error", "No flight for return");
+                return "redirect:/main-page/home";
+            }
+        }
 
            return "redirect:/main-page/searchplane";
     }
+    @RequestMapping("/help")
+    public String help()
+    {
+        return "help";
+    }
+    @RequestMapping("/payment-search")
+    public String paymentSearch(@ModelAttribute("error") String error, Model model)
+    {
+        if (error != null)
+        {
+            model.addAttribute("error", error);
+        }
+        return "payment-search";
+    }
 
+    @RequestMapping("/look-for-reservation")
+    public String lookForReservation(@RequestParam("paymentId") String pnr, RedirectAttributes redirectAttributes)
+    {
+        if (companyService.findReservation(pnr) != null)
+        {
+            if (companyService.findReservation(pnr).getStatus() != null) {
+                redirectAttributes.addFlashAttribute("error", "Reservation already ticketed");
+                return "redirect:/main-page/payment-search";
+            }
+            return "redirect:/main-page/make-payment?pnrCode="+pnr;
+        }else{
+            redirectAttributes.addFlashAttribute("error", "No reservation found");
+            return "redirect:/main-page/payment-search";
+        }
+    }
 
+    @RequestMapping("/make-payment")
+    public String makePayment(@RequestParam("pnrCode") String pnr, Model model) {
+        Reservation reservation = companyService.findReservation(pnr);
+        List<UserPNR> users = companyService.getFlyersPNR(pnr);
+        Plane p1 = companyService.findById(reservation.getFlightNumberOne());
+        Plane p2 = companyService.findById(reservation.getFlightNumberTwo());
+        model.addAttribute("reservation", reservation);
+        model.addAttribute("users", users);
+        model.addAttribute("planeOne", p1);
+        model.addAttribute("planeTwo", p2);
+        return "payment";
+    }
     public String generatePNR()
     {
         SecureRandom random = new SecureRandom();
@@ -154,6 +207,26 @@ public class MainPageController {
     @PostMapping("/processarrival")
     public String processArrival(@RequestParam("planeId") int planeId, Model model) {
         reservation.setFlightNumberTwo(planeId);
+        return "redirect:/main-page/checkPlaneValidity";
+    }
+
+    @RequestMapping ("/checkPlaneValidity")
+    public String checkPlaneValidity(RedirectAttributes redirectAttributes)
+    {
+        Plane p1 = companyService.findById(reservation.getFlightNumberOne());
+        Plane p2 = companyService.findById(reservation.getFlightNumberTwo());
+        redirectAttributes.addFlashAttribute("error", "Please select a valid plane time");
+        if (flightInfo.getDepartureDate().getTime() == flightInfo.getArrivalDate().getTime())
+        {
+
+            System.out.println(p1.getTimeDeparture().compareTo(p2.getTimeDeparture()));
+            if (p1.getTimeDeparture().compareTo(p2.getTimeDeparture()) < 0)
+            {
+                return "redirect:/main-page/seatSelection";
+            }else{
+                return "redirect:/main-page/searchplane";
+            }
+        }
         return "redirect:/main-page/seatSelection";
     }
 
@@ -227,11 +300,6 @@ public class MainPageController {
         for (UserPNR user: users)
         {
             user.setPnr(reservation.getPnrCode());
-        }
-        int count = 0;
-        for (UserPNR user: users)
-        {
-            count++;
         }
         for (int i = 0; i < flightInfo.getAdult(); i++)
         {
@@ -319,6 +387,8 @@ public class MainPageController {
     @RequestMapping("/reservation-confirmed")
     public String reservationConfirmed(@RequestParam("pnrCode") String pnr, Model model)
     {
+        Reservation reservation1 = companyService.findReservation(pnr);
+        List<UserPNR> users = companyService.getFlyersPNR(pnr);
         companyService.changeReservationStatus(pnr);
         Plane p1 = companyService.findById(reservation.getFlightNumberOne());
         companyService.reduceSeat(p1, users.size(), reservation.getFirstType());
@@ -326,10 +396,10 @@ public class MainPageController {
             Plane p2 = companyService.findById(reservation.getFlightNumberTwo());
             companyService.reduceSeat(p2, users.size(), reservation.getSecondType());
         }
-        model.addAttribute("reservation", reservation);
+        model.addAttribute("reservation", reservation1);
         model.addAttribute("users", users);
-        model.addAttribute("planeOne", companyService.findById(reservation.getFlightNumberOne()));
-        model.addAttribute("planeTwo", companyService.findById(reservation.getFlightNumberTwo()));
+        model.addAttribute("planeOne", companyService.findById(reservation1.getFlightNumberOne()));
+        model.addAttribute("planeTwo", companyService.findById(reservation1.getFlightNumberTwo()));
         return "reservation-confirmation";
     }
     @RequestMapping("/find-reservation")

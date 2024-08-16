@@ -49,7 +49,7 @@
         }
 
         th {
-            background-color: #4CAF50;
+            background-color: #2980b9;
             color: white;
         }
 
@@ -73,7 +73,7 @@
 
         input[type="submit"] {
             padding: 12px 20px;
-            background-color: #4CAF50;
+            background-color:  #2980b9;
             color: white;
             border: none;
             border-radius: 5px;
@@ -84,7 +84,7 @@
         }
 
         input[type="submit"]:hover {
-            background-color: #45a049;
+            background-color: #2980b9;
         }
 
         .payment-options {
@@ -111,9 +111,9 @@
         }
 
         .payment-options input[type="radio"]:checked + label {
-            background-color: #4CAF50;
+            background-color: #2980b9;
             color: white;
-            border-color: #4CAF50;
+            border-color: #2980b9;
         }
 
         .payment-options label:hover {
@@ -203,12 +203,18 @@
         <input type="radio" id="credit-card" name="paymentType" value="Credit Card" required>
         <label for="credit-card">Credit Card</label>
     </div>
-
-
     <form th:action="@{/main-page/reservation-confirmed}" method="post">
         <input type="hidden" id="pnrCode" name="pnrCode" th:value="${reservation.pnrCode}">
         <input type="submit" th:value="Pay">
     </form>
+    <br>
+    <form th:action="@{/main-page/home}">
+        <input type="submit" value="Pay Later">
+    </form>
+
+
+
+
 </div>
 
 </body>

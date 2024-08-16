@@ -128,10 +128,25 @@
                 transform: scale(1);
             }
         }
+
+        .error-message {
+            color: #e74c3c; /* Red color for the error text */
+            font-size: 18px;
+            text-align: center;
+            margin-bottom: 20px;
+            font-weight: bold;
+            animation: fadeIn 0.6s ease forwards;
+        }
+
     </style>
 </head>
 <body>
 <h2 class="header">Going Planes</h2>
+
+<div th:if="${error}" class="error-message">
+    <span th:text="${error}"></span>
+</div>
+
 <div class="container">
     <div th:each="plane : ${planes}">
         <form th:action="@{/main-page/processdeparture}" method="post" th:object="${plane}">
