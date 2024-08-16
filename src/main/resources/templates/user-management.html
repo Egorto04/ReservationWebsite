@@ -5,92 +5,139 @@
     <title>User Management</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f4f4;
             margin: 0;
             padding: 0;
-            background-color: #f4f4f4;
-        }
-        .container {
-            width: 80%;
-            margin: 0 auto;
-            padding: 20px;
-            background-color: #fff;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            border-radius: 8px;
-            margin-top: 30px;
+            color: #333;
+            display: flex;
         }
 
         .sidebar {
             width: 250px;
-            background-color: #333;
-            color: #fff;
+            background-color: #2c3e50;
+            color: #ecf0f1;
             height: 100vh;
             position: fixed;
             top: 0;
             left: 0;
             padding: 20px;
             box-sizing: border-box;
+            transition: background-color 0.3s ease;
         }
 
         .sidebar h2 {
-            color: #fff;
+            color: #ecf0f1;
+            font-weight: 600;
+            margin-bottom: 30px;
         }
 
         .sidebar a {
-            color: #fff;
+            color: #ecf0f1;
             display: block;
-            padding: 10px;
+            padding: 12px;
             text-decoration: none;
-            margin-bottom: 10px;
-            border-radius: 4px;
+            margin-bottom: 15px;
+            border-radius: 6px;
+            transition: background-color 0.3s ease;
         }
 
         .sidebar a:hover {
-            background-color: #575757;
+            background-color: #34495e;
         }
 
         .main-content {
-            margin-left: 22%;
-            padding: 20px;
+            margin-left: 270px;
+            padding: 40px;
+            flex-grow: 1;
+            background-color: #ecf0f1;
+            transition: background-color 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
         }
-        form {
-            width: 60%;
-            margin: 0 auto;
-        }
-        label {
-            font-weight: bold;
-            color: #555;
-        }
-        input[type="text"], input[type="password"] {
+
+        .container {
+            background-color: #ffffff;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fadeInUp 0.6s ease forwards;
+            max-width: 600px; /* Limiting the width of the container */
             width: 100%;
-            padding: 10px;
-            margin: 10px 0 20px 0;
-            display: inline-block;
-            border: 1px solid #ccc;
-            border-radius: 4px;
             box-sizing: border-box;
         }
+
+        .header {
+            text-align: center;
+            font-size: 28px;
+            color: #2c3e50;
+            margin-bottom: 30px;
+        }
+
+        label {
+            font-weight: bold;
+            color: #34495e;
+            display: block;
+            margin-bottom: 8px;
+            text-align: left;
+        }
+
+        input[type="text"],
+        input[type="password"] {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 20px;
+            border: 1px solid #bdc3c7;
+            border-radius: 6px;
+            font-size: 16px;
+            box-sizing: border-box;
+            transition: border-color 0.3s ease;
+        }
+
+        input[type="text"]:focus,
+        input[type="password"]:focus {
+            border-color: #3498db;
+            outline: none;
+        }
+
         input[type="submit"] {
             width: 100%;
-            background-color: #4CAF50;
+            background-color: #3498db;
             color: white;
             padding: 14px 20px;
-            margin: 10px 0;
             border: none;
-            border-radius: 4px;
+            border-radius: 6px;
             cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s ease, transform 0.3s ease;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
         }
+
         input[type="submit"]:hover {
-            background-color: #45a049;
+            background-color: #2980b9;
+            transform: scale(1.02);
         }
+
         .error-message {
             color: red;
             text-align: center;
             margin-bottom: 20px;
+            font-size: 14px;
         }
-        .header{
-            padding: 10px;
-            text-align: center;
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
     </style>
 </head>
@@ -99,7 +146,7 @@
     <h2>Menu</h2>
     <a th:href="@{/section1}">Search Plane</a>
     <a th:href="@{/section2}">Reservations</a>
-    <a th:href="@{/section3}">Payment</a>
+    <a th:href="@{/section3}">User Management</a>
 </div>
 
 <div class="main-content">
@@ -110,23 +157,27 @@
             <p th:text="${error}"></p>
         </div>
         <form th:action="@{/main-page/add-user}" method="post">
-            <label for="username">Username:</label><br>
-            <input type="text" id="username" name="username"><br>
-            <label for="password">Password:</label><br>
-            <input type="password" id="password" name="password"><br>
-            <label for="confirmPassword">Password (Again):</label><br>
-            <input type="password" id="confirmPassword" name="confirmPassword"><br>
+            <label for="username">Username:</label>
+            <input type="text" id="username" name="username" required>
+
+            <label for="password">Password:</label>
+            <input type="password" id="password" name="password" required>
+
+            <label for="confirmPassword">Password (Again):</label>
+            <input type="password" id="confirmPassword" name="confirmPassword" required>
+
             <input type="submit" value="Submit">
         </form>
     </div>
+
     <div class="container">
         <h2 class="header">Delete User</h2>
         <div th:if="${error1 != null}" class="error-message">
             <p th:text="${error1}"></p>
         </div>
         <form th:action="@{/main-page/delete-user}" method="post">
-            <label for="delUsername">Username:</label><br>
-            <input type="text" id="delUsername" name="delUsername"><br>
+            <label for="delUsername">Username:</label>
+            <input type="text" id="delUsername" name="delUsername" required>
             <input type="submit" value="Delete">
         </form>
     </div>

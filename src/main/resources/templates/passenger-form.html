@@ -6,58 +6,104 @@
     <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
     <title>Create Passenger Form</title>
     <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #ecf0f1;
+            margin: 0;
+            padding: 20px;
+        }
+
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+            margin-bottom: 20px;
+            font-size: 28px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: #ffffff;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        }
+
         .passenger-form {
             margin-bottom: 20px;
-            padding: 10px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            background-color: #fafafa;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        .passenger-form fieldset {
+            border: none;
+            margin: 0;
+            padding: 0;
+        }
+
+        .passenger-form legend {
+            font-size: 1.4em;
+            color: #3498db;
+            margin-bottom: 15px;
+            text-align: center;
         }
 
         label {
-            display: inline-block;
-            width: 100px;
+            display: block;
             font-weight: bold;
             margin-bottom: 5px;
+            color: #333;
         }
 
-        input[type="text"], input[type="date"], select {
-            width: 200px;
-            margin-bottom: 10px;
+        input[type="text"], input[type="date"], select, input[type="email"] {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            box-sizing: border-box;
+            font-size: 14px;
         }
 
-        input[type="submit"] {
-            padding: 10px 20px;
-            background-color: #4CAF50;
+        input[type="text"]:focus, input[type="date"]:focus, select:focus, input[type="email"]:focus {
+            border-color: #3498db;
+            outline: none;
+        }
+
+        input[type="submit"], .continue {
+            padding: 15px;
+            background-color: #3498db;
             color: white;
             border: none;
-            border-radius: 5px;
+            border-radius: 6px;
             cursor: pointer;
-        }
-        .continue{
-            padding: 10px 20px;
-            background-color: #4CAF50;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
+            font-size: 16px;
+            width: 100%;
+            margin-top: 20px;
+            transition: background-color 0.3s ease, transform 0.3s ease;
         }
 
-        input[type="submit"]:hover {
-            background-color: #45a049;
+        input[type="submit"]:hover, .continue:hover {
+            background-color: #2980b9;
+            transform: scale(1.02);
         }
-
-
     </style>
 </head>
 <body>
 
-<h1>Create Passenger Form</h1>
-<form id="passengerForm" method="post">
-    <div id="passengerContainer">
-        <!-- Passenger forms will be appended here -->
-    </div>
-    <input type="submit" value="Save">
-</form>
+<div class="container">
+    <h1>Create Passenger Form</h1>
+    <form id="passengerForm" method="post">
+        <div id="passengerContainer">
+            <!-- Passenger forms will be appended here -->
+        </div>
+        <input type="submit" value="Save">
+    </form>
+</div>
+
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         const passengerContainer = document.getElementById('passengerContainer');
@@ -66,22 +112,22 @@
         const csrfToken = document.querySelector('meta[name="_csrf"]').getAttribute('content');
         const csrfHeader = document.querySelector('meta[name="_csrf_header"]').getAttribute('content');
 
-        // Get the values from the hidden input fields
         let adultNum = parseInt(document.getElementById("adult").value) || 0;
         let childNum = parseInt(document.getElementById("child").value) || 0;
         let infantNum = parseInt(document.getElementById("infant").value) || 0;
 
-        // Loop to create forms for adults
+        // Calculate the minimum date (100 years ago from today)
+        const today = new Date();
+        const minDate = new Date(today.getFullYear() - 100, today.getMonth(), today.getDate()).toISOString().split('T')[0];
+
         for (let i = 0; i < adultNum; i++) {
             addPassengerForm('Adult');
         }
 
-        // Loop to create forms for children
         for (let i = 0; i < childNum; i++) {
             addPassengerForm('Child');
         }
 
-        // Loop to create forms for infants
         for (let i = 0; i < infantNum; i++) {
             addPassengerForm('Infant');
         }
@@ -89,52 +135,48 @@
         function addPassengerForm(type) {
             passengerCount++;
 
-            // Create a new div for the passenger form
             const passengerDiv = document.createElement('div');
             passengerDiv.className = 'passenger-form';
             passengerDiv.id = `passenger-${passengerCount}`;
 
-            // Add form fields to the passenger div
             passengerDiv.innerHTML = `
                 <fieldset>
                     <legend>${type} Passenger ${passengerCount}</legend>
 
                     <label for="name-${passengerCount}">Name:</label>
-                    <input type="text" name="passengers[${passengerCount}].name" id="name-${passengerCount}" required><br/>
+                    <input type="text" name="passengers[${passengerCount}].name" id="name-${passengerCount}" required>
 
                     <label for="surname-${passengerCount}">Surname:</label>
-                    <input type="text" name="passengers[${passengerCount}].surname" id="surname-${passengerCount}" required><br/>
+                    <input type="text" name="passengers[${passengerCount}].surname" id="surname-${passengerCount}" required>
 
                     <label for="birthDate-${passengerCount}">Birth Date:</label>
-                    <input type="date" name="passengers[${passengerCount}].birthDate" id="birthDate-${passengerCount}" required><br/>
+                    <input type="date" name="passengers[${passengerCount}].birthDate" id="birthDate-${passengerCount}" required min="${minDate}">
 
                     <label for="gender-${passengerCount}">Gender:</label>
                     <select name="passengers[${passengerCount}].gender" id="gender-${passengerCount}">
                         <option value="Male">Male</option>
                         <option value="Female">Female</option>
-                    </select><br/>
+                    </select>
 
                     <label for="passportNo-${passengerCount}">Passport No:</label>
-                    <input type="text" name="passengers[${passengerCount}].passportNo" id="passportNo-${passengerCount}" required><br/>
+                    <input type="text" name="passengers[${passengerCount}].passportNo" id="passportNo-${passengerCount}" required>
 
                     <label for="nationalityNo-${passengerCount}">Nationality No:</label>
-                    <input type="text" name="passengers[${passengerCount}].nationalityNo" id="nationalityNo-${passengerCount}" required><br/>
+                    <input type="text" name="passengers[${passengerCount}].nationalityNo" id="nationalityNo-${passengerCount}" required>
 
                     <label for="telNo-${passengerCount}">Tel No:</label>
-                    <input type="text" name="passengers[${passengerCount}].telNo" id="telNo-${passengerCount}" required><br/>
+                    <input type="text" name="passengers[${passengerCount}].telNo" id="telNo-${passengerCount}" required>
 
                     <label for="email-${passengerCount}">Email:</label>
-                    <input type="email" name="passengers[${passengerCount}].email" id="email-${passengerCount}" required><br/>
+                    <input type="email" name="passengers[${passengerCount}].email" id="email-${passengerCount}" required>
                 </fieldset>
             `;
-            // Append the passenger div to the container
             passengerContainer.appendChild(passengerDiv);
         }
 
         document.getElementById('passengerForm').addEventListener('submit', function(event) {
-            event.preventDefault(); // Prevent default form submission
+            event.preventDefault();
 
-            // Gather form data into an array
             let passengers = [];
 
             for (let i = 1; i <= passengerCount; i++) {

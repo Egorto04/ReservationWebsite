@@ -65,7 +65,6 @@ public class MainPageController {
         model.addAttribute("countries", countries);
         model.addAttribute("numbers", numbers);
         model.addAttribute("flight", new FlightInfo());
-        System.out.println(error);
         if (error != null)
         {
             model.addAttribute("error", error);
@@ -76,10 +75,8 @@ public class MainPageController {
     public String searchPlane( Model model) {
         List<Plane> planes = companyService.findPlane(flightInfo.getDeparture(),flightInfo.getLanding(),flightInfo.getDepartureDate());
         model.addAttribute("planes", planes);
-        System.out.println(flightInfo);
 
         int adult = flightInfo.getInfant();
-        System.out.println(adult);
         model.addAttribute("flight", flightInfo);
         return "departure-plane-show";
     }
@@ -90,9 +87,6 @@ public class MainPageController {
         Plane p = companyService.findById(planeId);
         reservation.setFlightNumberOne(planeId);
         reservation.setFlightNumberTwo(0);
-        System.out.println(flightInfo);
-        System.out.println(p);
-        System.out.println(reservation);
 
         if (flightInfo.getDirection().equals("Roundtrip"))
         {
@@ -127,21 +121,18 @@ public class MainPageController {
     }
 
     @PostMapping("/checkValid")
-    public String checkvalid(@Valid @ModelAttribute("flightInfo") FlightInfo flight, BindingResult theBindingResult, Model model) {
+    public String checkvalid(@Valid @ModelAttribute("flightInfo") FlightInfo flight, BindingResult theBindingResult, Model model, RedirectAttributes redirectAttributes) {
 
         flightInfo = flight;
-        System.out.println(flightInfo);
 
         List<Plane> planes = companyService.findPlane(flightInfo.getDeparture(),flightInfo.getLanding(),flightInfo.getDepartureDate());
-        System.out.println(planes);
         if (planes.isEmpty())
         {
-            model.addAttribute("countries", countries);
-            model.addAttribute("numbers", numbers);
-            model.addAttribute("flight", new FlightInfo());
-            model.addAttribute("error", "No flight found");
-            System.out.println("No flight found");
-            return "main-page";
+            redirectAttributes.addFlashAttribute("countries", countries);
+            redirectAttributes.addFlashAttribute("numbers", numbers);
+            redirectAttributes.addFlashAttribute("flight", new FlightInfo());
+            redirectAttributes.addFlashAttribute("error", "No flight found");
+            return "redirect:/main-page/home";
         }
 
 
@@ -163,7 +154,6 @@ public class MainPageController {
     @PostMapping("/processarrival")
     public String processArrival(@RequestParam("planeId") int planeId, Model model) {
         reservation.setFlightNumberTwo(planeId);
-        System.out.println(reservation);
         return "redirect:/main-page/seatSelection";
     }
 
@@ -201,12 +191,6 @@ public class MainPageController {
 
         reservation.setSecondPrice(secondPrice);
 
-        System.out.println(firstPrice);
-
-        System.out.println(secondPrice);
-
-        System.out.println(reservation);
-
         int count = 0;
 
         List<UserPNR> users = new ArrayList<>();
@@ -227,10 +211,6 @@ public class MainPageController {
         model.addAttribute("child", flightInfo.getChild());
         model.addAttribute("infant", flightInfo.getInfant());
         model.addAttribute("users", users);
-        for (UserPNR user : users)
-        {
-            System.out.println(user);
-        }
 
         return "passenger-form";
     }
@@ -252,8 +232,6 @@ public class MainPageController {
         for (UserPNR user: users)
         {
             count++;
-            System.out.println(count);
-            System.out.println(user);
         }
         for (int i = 0; i < flightInfo.getAdult(); i++)
         {
@@ -303,9 +281,6 @@ public class MainPageController {
     @RequestMapping("/add-user")
     public String addUser(@RequestParam("username") String username, @RequestParam("password") String password, @RequestParam("confirmPassword") String confirmPassword,  RedirectAttributes redirectAttributes,Model model)
     {
-        System.out.println(username);
-        System.out.println(password);
-        System.out.println(confirmPassword);
         if (!password.equals(confirmPassword))
         {
             redirectAttributes.addFlashAttribute("error", "Password does not match");
@@ -368,7 +343,6 @@ public class MainPageController {
 
     @RequestMapping("/find-reservation-info")
     public String findPNRReservation(@RequestParam("pnrCode") String pnr, RedirectAttributes redirectAttributes, Model model) {
-        System.out.println(pnr);
         if (companyService.findReservation(pnr) == null) {
             redirectAttributes.addFlashAttribute("error", "No reservation found");
             return "redirect:/main-page/find-reservation";

@@ -6,8 +6,8 @@
     <title>Seat Selection</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f4f4;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #ecf0f1;
             margin: 0;
             padding: 20px;
         }
@@ -15,34 +15,34 @@
         .container {
             max-width: 800px;
             margin: 0 auto;
-            background-color: #fff;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            background-color: #ffffff;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
         }
 
         h1 {
             text-align: center;
-            color: #333;
-            margin-bottom: 20px;
-            font-size: 24px;
+            color: #2c3e50;
+            margin-bottom: 30px;
+            font-size: 28px;
         }
 
         table {
             width: 100%;
             border-collapse: collapse;
-            margin-bottom: 20px;
+            margin-bottom: 30px;
         }
 
         th, td {
             border: 1px solid #ddd;
-            padding: 12px;
+            padding: 15px;
             text-align: center;
             font-size: 16px;
         }
 
         th {
-            background-color: #4CAF50;
+            background-color: #3498db;
             color: white;
         }
 
@@ -50,32 +50,74 @@
             background-color: #f9f9f9;
         }
 
+        tr:hover {
+            background-color: #f1f1f1;
+        }
+
         caption {
             font-size: 1.5em;
             margin: 20px 0;
             font-weight: bold;
+            color: #2c3e50;
         }
 
-        input[type="radio"] {
-            transform: scale(1.2);
-            margin: 0 10px;
+        .radio-group {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .radio-group label {
+            margin-right: 20px;
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            font-size: 16px;
+            color: #2c3e50;
+        }
+
+        .radio-group input[type="radio"] {
+            display: none;
+        }
+
+        .radio-group input[type="radio"] + label:before {
+            content: "";
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            margin-right: 10px;
+            border: 2px solid #3498db;
+            border-radius: 50%;
+            background-color: #fff;
+            transition: background-color 0.3s ease, border-color 0.3s ease;
+        }
+
+        .radio-group input[type="radio"]:checked + label:before {
+            background-color: #3498db;
+            border-color: #2980b9;
+        }
+
+        .radio-group label:hover:before {
+            border-color: #2980b9;
         }
 
         .submit-button {
             display: block;
             width: 100%;
-            background-color: #4CAF50;
+            background-color: #3498db;
             color: white;
             padding: 15px;
             font-size: 18px;
             border: none;
-            border-radius: 4px;
+            border-radius: 6px;
             cursor: pointer;
-            transition: background-color 0.3s ease;
+            transition: background-color 0.3s ease, transform 0.3s ease;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
         }
 
         .submit-button:hover {
-            background-color: #45a049;
+            background-color: #2980b9;
+            transform: scale(1.02);
         }
     </style>
 </head>
@@ -92,28 +134,48 @@
                 <th>Business Price</th>
                 <th>Economy Seats Available</th>
                 <th>Business Seats Available</th>
-                <th>Select Economy</th>
-                <th>Select Business</th>
+                <th></th>
+                <th></th>
             </tr>
             </thead>
             <tbody>
             <tr>
                 <td>Going</td>
-                <td th:text="${flightOne.economyPrice}"></td>
-                <td th:text="${flightOne.bussinessPrice}"></td>
+                <td th:text="${flightOne.economyPrice} + '$'"></td>
+                <td th:text="${flightOne.bussinessPrice} + '$'"></td>
                 <td th:text="${flightOne.economySeat}"></td>
                 <td th:text="${flightOne.businessSeat}"></td>
-                <td><input type="radio" name="goFlight" th:field="${reservation.firstType}" th:value="Economy" required></td>
-                <td><input type="radio" name="goFlight" th:field="${reservation.firstType}" th:value="Business" required></td>
+                <td>
+                    <div class="radio-group">
+                        <input type="radio" id="goFlightEconomy" name="goFlight" th:field="${reservation.firstType}" th:value="Economy" required>
+                        <label for="goFlightEconomy">Economy</label>
+                    </div>
+                </td>
+                <td>
+                    <div class="radio-group">
+                        <input type="radio" id="goFlightBusiness" name="goFlight" th:field="${reservation.firstType}" th:value="Business" required>
+                        <label for="goFlightBusiness">Business</label>
+                    </div>
+                </td>
             </tr>
             <tr th:if="${isRoundTrip}">
                 <td>Returning</td>
-                <td th:text="${flightTwo.economyPrice}"></td>
-                <td th:text="${flightTwo.bussinessPrice}"></td>
+                <td th:text="${flightTwo.economyPrice}+ '$'"></td>
+                <td th:text="${flightTwo.bussinessPrice}+ '$'"></td>
                 <td th:text="${flightTwo.economySeat}"></td>
                 <td th:text="${flightTwo.businessSeat}"></td>
-                <td><input type="radio" name="returnFlight" th:field="${reservation.secondType}" th:value="Economy" required></td>
-                <td><input type="radio" name="returnFlight" th:field="${reservation.secondType}" th:value="Business" required></td>
+                <td>
+                    <div class="radio-group">
+                        <input type="radio" id="returnFlightEconomy" name="returnFlight" th:field="${reservation.secondType}" th:value="Economy" required>
+                        <label for="returnFlightEconomy">Economy</label>
+                    </div>
+                </td>
+                <td>
+                    <div class="radio-group">
+                        <input type="radio" id="returnFlightBusiness" name="returnFlight" th:field="${reservation.secondType}" th:value="Business" required>
+                        <label for="returnFlightBusiness">Business</label>
+                    </div>
+                </td>
             </tr>
             </tbody>
         </table>

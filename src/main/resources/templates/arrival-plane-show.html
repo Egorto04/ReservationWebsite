@@ -7,7 +7,7 @@
     <title>Planes</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background-color: #f4f4f4;
             margin: 0;
             padding: 20px;
@@ -16,10 +16,14 @@
         .container {
             max-width: 900px;
             margin: 0 auto;
-            padding: 20px;
-            background-color: #fff;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            border-radius: 8px;
+            padding: 30px;
+            background-color: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            box-sizing: border-box;
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fadeInUp 0.6s ease forwards;
         }
 
         .plane-details {
@@ -28,6 +32,9 @@
             margin-bottom: 20px;
             border-radius: 8px;
             background-color: #fafafa;
+            opacity: 0;
+            transform: scale(0.95);
+            animation: fadeInScale 0.6s ease forwards;
         }
 
         .plane-details h2 {
@@ -42,7 +49,7 @@
         .plane-details p {
             font-size: 16px;
             margin: 10px 0;
-            line-height: 1.5;
+            line-height: 1.6;
         }
 
         .plane-details p strong {
@@ -55,31 +62,70 @@
 
         .plane-details input[type="submit"] {
             display: inline-block;
-            padding: 10px 20px;
+            padding: 12px 24px;
             font-size: 16px;
-            color: #fff;
+            color: #ffffff;
             background-color: #4CAF50;
             border: none;
-            border-radius: 4px;
+            border-radius: 6px;
             cursor: pointer;
             margin-top: 20px;
-            transition: background-color 0.3s ease;
+            transition: background-color 0.3s ease, transform 0.3s ease;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
         }
 
         .plane-details input[type="submit"]:hover {
             background-color: #45a049;
+            transform: scale(1.02);
         }
-        .header
-        {
+
+        .header {
             text-align: center;
-            margin-bottom: 20px;
+            margin-bottom: 40px;
+            font-size: 32px;
+            color: #2c3e50;
+            opacity: 0;
+            animation: fadeInDown 0.6s ease forwards;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeInScale {
+            from {
+                opacity: 0;
+                transform: scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
         }
     </style>
 </head>
 <body>
 <h2 class="header">Returning Planes</h2>
 <div th:each="plane : ${planes}">
-    <form class="container" th:action="@{/main-page/processarrival}" th:object="${plane}" method="post" >
+    <form class="container" th:action="@{/main-page/processarrival}" th:object="${plane}" method="post">
         <div class="plane-details">
             <h2>Plane Details</h2>
             <p><strong>Departure Location:</strong> <span th:text="${plane.departureLocation}">Departure Location</span></p>
@@ -87,15 +133,14 @@
             <p><strong>Date Departure:</strong> <span th:text="${#dates.format(plane.dateDeparture, 'yyyy-MM-dd')}">Date Departure</span></p>
             <p><strong>Time Departure:</strong> <span th:text="${plane.timeDeparture}">Time Departure</span></p>
             <p><strong>Available Seats:</strong> <span th:text="${plane.availabeSeats}">Available Seats</span></p>
-            <p><strong>Economy Price:</strong> $<span th:text="${plane.economyPrice}">Economy Price</span></p>
-            <p><strong>Business Price:</strong> $<span th:text="${plane.bussinessPrice}">Business Price</span></p>
+            <p><strong>Economy Price:</strong> <span th:text="${plane.economyPrice} + '$'">Economy Price</span></p>
+            <p><strong>Business Price:</strong> <span th:text="${plane.bussinessPrice} + '$'">Business Price</span></p>
             <p><strong>Economy Seats Available:</strong> <span th:text="${plane.economySeat}">Economy Seats</span></p>
             <p><strong>Business Seats Available:</strong> <span th:text="${plane.businessSeat}">Business Seats</span></p>
             <input type="hidden" name="planeId" th:value="*{flightId}">
             <input type="submit" th:value="Select">
         </div>
     </form>
-
 </div>
 </body>
 </html>

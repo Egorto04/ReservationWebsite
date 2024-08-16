@@ -5,8 +5,8 @@
     <title>Custom Login Form</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
-            background-color: #f0f2f5;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #ecf0f1;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -16,46 +16,49 @@
 
         .login-container {
             background-color: #ffffff;
-            padding: 30px;
-            border-radius: 8px;
-            box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
-            width: 350px;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            width: 360px;
             text-align: center;
-            position: relative;
-        }
-
-        .login-container img {
-            width: 80px;
-            height: auto;
-            margin-bottom: 20px;
+            animation: fadeInUp 0.6s ease forwards;
+            opacity: 0;
+            transform: translateY(20px);
         }
 
         h3 {
             margin-bottom: 20px;
-            color: #333;
-        }
-
-        p {
-            margin: 10px 0;
+            color: #2c3e50;
+            font-size: 24px;
         }
 
         .login-container p {
             color: #d32f2f;
             font-size: 14px;
+            margin: 10px 0;
         }
 
         input[type="text"],
         input[type="password"] {
             width: 100%;
-            padding: 10px;
+            padding: 12px;
             margin: 8px 0;
-            border: 1px solid #ccc;
-            border-radius: 4px;
+            border: 1px solid #bdc3c7;
+            border-radius: 6px;
             box-sizing: border-box;
+            font-size: 16px;
+            transition: border-color 0.3s ease;
+        }
+
+        input[type="text"]:focus,
+        input[type="password"]:focus {
+            border-color: #3498db;
+            outline: none;
         }
 
         .password-container {
             position: relative;
+            margin-bottom: 20px;
         }
 
         .toggle-password {
@@ -67,33 +70,35 @@
             border: none;
             cursor: pointer;
             font-size: 14px;
-            color: #4CAF50;
+            color: #3498db;
         }
 
         input[type="submit"] {
             width: 100%;
-            background-color: #4CAF50;
+            background-color: #3498db;
             color: white;
-            padding: 12px 20px;
+            padding: 14px;
             border: none;
-            border-radius: 4px;
+            border-radius: 6px;
             cursor: pointer;
             font-size: 16px;
-            margin-top: 20px;
+            transition: background-color 0.3s ease, transform 0.3s ease;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
         }
 
         input[type="submit"]:hover {
-            background-color: #45a049;
+            background-color: #2980b9;
+            transform: scale(1.02);
         }
 
         .error-message {
-            color: #d32f2f;
+            color: #e74c3c;
             font-size: 14px;
             margin-bottom: 15px;
         }
 
         .success-message {
-            color: #4CAF50;
+            color: #2ecc71;
             font-size: 14px;
             margin-bottom: 15px;
         }
@@ -101,30 +106,39 @@
         a {
             display: inline-block;
             margin-top: 20px;
-            color: #4CAF50;
+            color: #3498db;
             text-decoration: none;
+            font-size: 14px;
         }
 
         a:hover {
             text-decoration: underline;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
     </style>
 </head>
 <body>
 
 <div class="login-container">
-    <img src="/static/hitit_logo_final.jpg" alt="Logo">
     <h3>My Custom Login Page</h3>
     <div th:if="${param.logout}" class="success-message">
-        <p>Successfully Logged Out!!</p>
+        <p>Successfully Logged Out!</p>
     </div>
     <form action="#" th:action="@{/authenticateTheUser}" method="POST">
         <div th:if="${param.error}" class="error-message">
             <p>Invalid username or password</p>
         </div>
-        <p>
-            <input type="text" name="username" placeholder="Username" required>
-        </p>
+        <input type="text" name="username" placeholder="Username" required>
         <div class="password-container">
             <input type="password" name="password" id="password" placeholder="Password" required>
             <button type="button" class="toggle-password" onclick="togglePasswordVisibility()">Show</button>

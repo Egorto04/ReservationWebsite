@@ -133,12 +133,12 @@ public class CompanyService implements UserDetailsService {
     {
         reservationDAO.changeRes(id);
     }
-//
+
 //    @PostConstruct
 //    public void createPlanes(){
 //        Random rand = new Random();
 //        String[] locations = new String[]{"Ankara","Istanbul","Konya","Izmir","Antalya","Adana","Trabzon","Samsun","Erzurum","Van"};
-//        for (int i = 0; i < 10000; i++) {
+//        for (int i = 0; i < 20000; i++) {
 //            Plane p = new Plane();
 //            int randNum = rand.nextInt(locations.length);
 //            p.setDepartureLocation(locations[randNum]);
