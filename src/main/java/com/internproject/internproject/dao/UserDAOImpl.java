@@ -4,6 +4,8 @@ package com.internproject.internproject.dao;
 import com.internproject.internproject.entity.User;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.TypedQuery;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -13,8 +15,11 @@ public class UserDAOImpl implements UserDAO{
 
     private EntityManager em;
 
+    private PasswordEncoder passwordEncoder;
+
     public UserDAOImpl(EntityManager em) {
         this.em = em;
+        this.passwordEncoder = new BCryptPasswordEncoder();
     }
 
     @Override
@@ -48,16 +53,12 @@ public class UserDAOImpl implements UserDAO{
     public User findByUsername(String username) {
         TypedQuery<User> query = em.createQuery("from User where username = :username", User.class);
         query.setParameter("username", username);
-
-
         User theUser = null;
-
         try{
             theUser = query.getSingleResult();
         }catch (Exception e){
             theUser = null;
         }
-
         return theUser;
 
     }

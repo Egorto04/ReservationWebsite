@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="_csrf" th:content="${_csrf.token}"/>
+    <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
+    <title>Edit Passenger Form</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #ecf0f1;
+            margin: 0;
+            padding: 20px;
+        }
+
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+            margin-bottom: 20px;
+            font-size: 28px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: #ffffff;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .passenger-form {
+            margin-bottom: 20px;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            background-color: #fafafa;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        .passenger-form fieldset {
+            border: none;
+            margin: 0;
+            padding: 0;
+        }
+
+        .passenger-form legend {
+            font-size: 1.4em;
+            color: #3498db;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 5px;
+            color: #333;
+        }
+
+        input[type="text"], input[type="date"], select, input[type="email"] {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            box-sizing: border-box;
+            font-size: 14px;
+        }
+
+        input[type="text"]:focus, input[type="date"]:focus, select:focus, input[type="email"]:focus {
+            border-color: #3498db;
+            outline: none;
+        }
+
+        input[type="submit"], .continue {
+            padding: 15px;
+            background-color: #3498db;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            width: 100%;
+            margin-top: 20px;
+            transition: background-color 0.3s ease, transform 0.3s ease;
+        }
+
+        input[type="submit"]:hover, .continue:hover {
+            background-color: #2980b9;
+            transform: scale(1.02);
+        }
+
+        .error {
+            color: red;
+            font-size: 12px;
+            margin-top: -10px;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Edit Passenger Form</h1>
+    <form id="passengerForm" method="post">
+        <div id="passengerContainer">
+            <!-- Passenger forms will be pre-filled here -->
+        </div>
+        <input type="submit" value="Save Changes">
+    </form>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const passengerContainer = document.getElementById('passengerContainer');
+
+        const csrfToken = document.querySelector('meta[name="_csrf"]').getAttribute('content');
+        const csrfHeader = document.querySelector('meta[name="_csrf_header"]').getAttribute('content');
+
+        const passengers = JSON.parse(document.getElementById('passengerData').textContent); // Assuming passenger data is passed as JSON
+
+        passengers.forEach((passenger, index) => {
+            addPassengerForm(passenger, index + 1);
+        });
+
+        function addPassengerForm(passenger, passengerIndex) {
+            const passengerDiv = document.createElement('div');
+            passengerDiv.className = 'passenger-form';
+            passengerDiv.id = `passenger-${passengerIndex}`;
+
+            const formattedBirthDate = formatDate(passenger.birthDate);
+
+            passengerDiv.innerHTML = `
+                <fieldset>
+                    <legend>Edit Passenger ${passengerIndex}</legend>
+
+                    <label for="name-${passengerIndex}">Name:</label>
+                    <input type="text" name="passengers[${passengerIndex}].name" id="name-${passengerIndex}" value="${passenger.name}" required>
+                    <div class="error" id="error-name-${passengerIndex}"></div>
+
+                    <label for="surname-${passengerIndex}">Surname:</label>
+                    <input type="text" name="passengers[${passengerIndex}].surname" id="surname-${passengerIndex}" value="${passenger.surname}" required>
+                    <div class="error" id="error-surname-${passengerIndex}"></div>
+
+                    <label for="birthDate-${passengerIndex}">Birth Date:</label>
+                    <input type="date" name="passengers[${passengerIndex}].birthDate" id="birthDate-${passengerIndex}" value="${formattedBirthDate}" required>
+                    <div class="error" id="error-birthDate-${passengerIndex}"></div>
+
+                    <label for="gender-${passengerIndex}">Gender:</label>
+                    <select name="passengers[${passengerIndex}].gender" id="gender-${passengerIndex}">
+                        <option value="Male" ${passenger.gender === 'Male' ? 'selected' : ''}>Male</option>
+                        <option value="Female" ${passenger.gender === 'Female' ? 'selected' : ''}>Female</option>
+                    </select>
+
+                    <label for="passportNo-${passengerIndex}">Passport No:</label>
+                    <input type="text" name="passengers[${passengerIndex}].passportNo" id="passportNo-${passengerIndex}" value="${passenger.passportNo}" required pattern="^[A-Za-z0-9]{6,9}$" title="Passport number should be 6-9 characters long, containing only letters and numbers.">
+                    <div class="error" id="error-passportNo-${passengerIndex}"></div>
+
+                    <label for="nationalityNo-${passengerIndex}">Nationality No:</label>
+                    <input type="text" name="passengers[${passengerIndex}].nationalityNo" id="nationalityNo-${passengerIndex}" value="${passenger.nationalityNo}" required pattern="^[0-9]{11}$" title="Nationality number should be exactly 11 digits.">
+                    <div class="error" id="error-nationalityNo-${passengerIndex}"></div>
+
+                    <label for="telNo-${passengerIndex}">Tel No:</label>
+                    <input type="text" name="passengers[${passengerIndex}].telNo" id="telNo-${passengerIndex}" value="${passenger.telNo}" required pattern="^[0-9]{10,15}$" title="Phone number should be between 10 and 15 digits.">
+                    <div class="error" id="error-telNo-${passengerIndex}"></div>
+
+                    <label for="email-${passengerIndex}">Email:</label>
+                    <input type="email" name="passengers[${passengerIndex}].email" id="email-${passengerIndex}" value="${passenger.email}" required>
+                    <div class="error" id="error-email-${passengerIndex}"></div>
+                </fieldset>
+            `;
+            passengerContainer.appendChild(passengerDiv);
+        }
+
+        function formatDate(date) {
+            // If date is in milliseconds
+            if (!isNaN(date)) {
+                date = new Date(parseInt(date));
+            } else {
+                // If date is already in string format but not yyyy-MM-dd
+                date = new Date(date);
+            }
+
+            const year = date.getFullYear();
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const day = String(date.getDate()).padStart(2, '0');
+            return `${year}-${month}-${day}`;
+        }
+
+        document.getElementById('passengerForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+
+            let valid = true;
+
+            passengers.forEach((passenger, index) => {
+                const passengerIndex = index + 1;
+
+                const name = document.getElementById(`name-${passengerIndex}`);
+                const surname = document.getElementById(`surname-${passengerIndex}`);
+                const birthDate = document.getElementById(`birthDate-${passengerIndex}`);
+                const passportNo = document.getElementById(`passportNo-${passengerIndex}`);
+                const nationalityNo = document.getElementById(`nationalityNo-${passengerIndex}`);
+                const telNo = document.getElementById(`telNo-${passengerIndex}`);
+                const email = document.getElementById(`email-${passengerIndex}`);
+
+                clearErrors(passengerIndex);
+
+                if (!validateText(name)) valid = false;
+                if (!validateText(surname)) valid = false;
+                if (!validateDate(birthDate)) valid = false;
+                if (!validatePattern(passportNo)) valid = false;
+                if (!validatePattern(nationalityNo)) valid = false;
+                if (!validatePattern(telNo)) valid = false;
+                if (!validateEmail(email)) valid = false;
+            });
+
+            if (valid) {
+                const updatedPassengers = passengers.map((passenger, index) => {
+                    const passengerIndex = index + 1;
+                    return {
+                        ...passenger,
+                        name: document.getElementById(`name-${passengerIndex}`).value,
+                        surname: document.getElementById(`surname-${passengerIndex}`).value,
+                        birthDate: document.getElementById(`birthDate-${passengerIndex}`).value,
+                        gender: document.getElementById(`gender-${passengerIndex}`).value,
+                        passportNo: document.getElementById(`passportNo-${passengerIndex}`).value,
+                        nationalityNo: document.getElementById(`nationalityNo-${passengerIndex}`).value,
+                        telNo: document.getElementById(`telNo-${passengerIndex}`).value,
+                        email: document.getElementById(`email-${passengerIndex}`).value
+                    };
+                });
+
+                fetch('/main-page/update-passengers', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        [csrfHeader]: csrfToken
+                    },
+                    body: JSON.stringify(updatedPassengers)
+                })
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Network response was not ok');
+                        }
+                        window.location.href = "/main-page/reset-everything";
+                        return response.json();
+                    })
+                    .then(data => {
+                        console.log(data);
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                    });
+            }
+        });
+
+        function validateText(input) {
+            if (input.value.trim() === "") {
+                showError(input.id, "This field is required.");
+                return false;
+            }
+            return true;
+        }
+
+        function validateDate(input) {
+            if (input.value.trim() === "" || new Date(input.value) > new Date()) {
+                showError(input.id, "Please enter a valid birth date.");
+                return false;
+            }
+            return true;
+        }
+
+        function validatePattern(input) {
+            if (!input.checkValidity()) {
+                showError(input.id, input.title);
+                return false;
+            }
+            return true;
+        }
+
+        function validateEmail(input) {
+            if (input.value.trim() === "" || !input.checkValidity()) {
+                showError(input.id, "Please enter a valid email address.");
+                return false;
+            }
+            return true;
+        }
+
+        function showError(inputId, message) {
+            document.getElementById(`error-${inputId}`).innerText = message;
+        }
+
+        function clearErrors(passengerIndex) {
+            const errorFields = [
+                `error-name-${passengerIndex}`,
+                `error-surname-${passengerIndex}`,
+                `error-birthDate-${passengerIndex}`,
+                `error-passportNo-${passengerIndex}`,
+                `error-nationalityNo-${passengerIndex}`,
+                `error-telNo-${passengerIndex}`,
+                `error-email-${passengerIndex}`
+            ];
+
+            errorFields.forEach(fieldId => {
+                document.getElementById(fieldId).innerText = "";
+            });
+        }
+    });
+</script>
+
+<!-- Hidden input to store passenger data -->
+<div id="passengerData" th:text="${passengerData}" style="display:none;"></div>
+
+</body>
+</html>

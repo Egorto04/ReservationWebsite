@@ -6,6 +6,8 @@ import com.internproject.internproject.service.CompanyService;
 import com.internproject.internproject.user.WebUser;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -16,10 +18,12 @@ import org.springframework.web.bind.annotation.PostMapping;
 @Controller
 public class SignInController {
     CompanyService companyService;
+    private final PasswordEncoder passwordEncoder;
 
     @Autowired
     public SignInController(CompanyService companyService) {
         this.companyService = companyService;
+        this.passwordEncoder = new BCryptPasswordEncoder();
     }
 
     @GetMapping("/create-account")
@@ -40,7 +44,7 @@ public class SignInController {
 
         User u = new User();
         u.setUsername(theUser.getUsername());
-        u.setPassword("{noop}"+theUser.getPassword());
+        u.setPassword(passwordEncoder.encode(theUser.getPassword()));
         u.setEmail(theUser.getEmail());
         u.setFirstName(theUser.getFirstName());
         u.setLastName(theUser.getLastName());

@@ -13,6 +13,8 @@ import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -355,6 +357,7 @@ public class MainPageController {
     @RequestMapping("/add-user")
     public String addUser(@RequestParam("username") String username, @RequestParam("password") String password, @RequestParam("confirmPassword") String confirmPassword,  RedirectAttributes redirectAttributes,Model model)
     {
+        PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
         if (!password.equals(confirmPassword))
         {
             redirectAttributes.addFlashAttribute("error", "Password does not match");
@@ -364,7 +367,7 @@ public class MainPageController {
         }else{
             User user = new User();
             user.setUsername(username);
-            password = "{noop}"+password;
+            password = passwordEncoder.encode(password);
             user.setPassword(password);
             companyService.saveUser(user);
             redirectAttributes.addFlashAttribute("error", "User added successfully");
@@ -457,6 +460,31 @@ public class MainPageController {
         flightInfo = null;
         users = null;
         return "redirect:/main-page/home";
+    }
+
+    @RequestMapping("/edit-passenger-info")
+    public String editPassenger(@RequestParam("pnrCode") String pnr, Model model)
+    {
+        List<UserPNR> passengers = companyService.getFlyersPNR(pnr);
+
+        // Serialize passenger data to JSON
+        ObjectMapper objectMapper = new ObjectMapper();
+        try {
+            String passengerDataJson = objectMapper.writeValueAsString(passengers);
+            model.addAttribute("passengerData", passengerDataJson);
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+            // Handle the error appropriately
+        }
+        return "edit-passenger-info";
+    }
+
+    @RequestMapping("/update-passengers")
+    public String updatePassengers(@RequestBody List<UserPNR> passengers) {
+        for (UserPNR passenger : passengers) {
+            companyService.savePNR(passenger);
+        }
+        return "redirect:/main-page/find-reservation-info?pnrCode=" + passengers.get(0).getPnr();
     }
 
 }

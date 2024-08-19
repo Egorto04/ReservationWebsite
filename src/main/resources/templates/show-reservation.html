@@ -199,32 +199,31 @@
 
         <div class="card" th:if="${reservation.flightNumberTwo} != 0">
             <h3>Flight Two</h3>
-            <div class="info-grid">
-                <div class="info-item">
-                <div class="info-item">
-                    <span class="info-label">Departure:</span>
-                    <span th:text="${planeTwo.departureLocation}"></span>
-                </div>
-                <div class="info-item">
-                    <span class="info-label">Landing:</span>
-                    <span th:text="${planeTwo.landingLocation}"></span>
-                </div>
-                <div class="info-item">
-                    <span class="info-label">Date of Departure:</span>
-                    <span th:text="${planeTwo.dateDeparture}"></span>
-                </div>
-                <div class="info-item">
-                    <span class="info-label">Departure Time:</span>
-                    <span th:text="${planeTwo.timeDeparture}"></span>
-                </div>
-                <div class="info-item">
-                    <span class="info-label">Class:</span>
-                    <span th:text="${reservation.secondType}"></span>
-                </div>
-                <div class="info-item">
-                    <span class="info-label">Price:</span>
-                    <span th:text="${reservation.secondPrice} + '$'"></span>
-                </div>
+                <div class="info-grid">
+                    <div class="info-item">
+                        <span class="info-label">Departure:</span>
+                        <span th:text="${planeTwo.departureLocation}"></span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Landing:</span>
+                        <span th:text="${planeTwo.landingLocation}"></span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Date of Departure:</span>
+                        <span th:text="${planeTwo.dateDeparture}"></span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Departure Time:</span>
+                        <span th:text="${planeTwo.timeDeparture}"></span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Class:</span>
+                        <span th:text="${reservation.secondType}"></span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Price:</span>
+                        <span th:text="${reservation.secondPrice} + '$'"></span>
+                    </div>
             </div>
         </div>
     </div>
@@ -234,10 +233,14 @@
             <input type="hidden" th:field="*{pnrCode}">
             <input type="submit" value="Cancel Reservation">
         </form>
-
+        <form th:action="@{/main-page/edit-passenger-info}" th:object="${reservation}" method="get">
+            <input type="hidden" th:field="*{pnrCode}">
+            <input type="submit" value="Edit Passengers">
+        </form>
         <form th:action="@{/main-page/reset-everything}">
             <input type="submit" value="Go to Home Page">
         </form>
+
     </div>
 </div>
 

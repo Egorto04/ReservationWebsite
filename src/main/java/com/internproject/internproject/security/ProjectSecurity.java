@@ -5,12 +5,10 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.provisioning.JdbcUserDetailsManager;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
-
-import javax.sql.DataSource;
 
 @Configuration
 public class ProjectSecurity {
@@ -19,39 +17,31 @@ public class ProjectSecurity {
     public DaoAuthenticationProvider daoAuthenticationProvider(CompanyService companyService) {
         DaoAuthenticationProvider daoAuthenticationProvider = new DaoAuthenticationProvider();
         daoAuthenticationProvider.setUserDetailsService(companyService);
+        daoAuthenticationProvider.setPasswordEncoder(passwordEncoder());
         return daoAuthenticationProvider;
     }
 
-//    @Bean
-//    UserDetailsService userDetailsService(DataSource dataSource) {
-//        JdbcUserDetailsManager userDetailsManager = new JdbcUserDetailsManager(dataSource);
-//
-//        userDetailsManager.setUsersByUsernameQuery("select user_id, pw, active from members where user_id=?");
-//        userDetailsManager.setAuthoritiesByUsernameQuery("select user_id, role from roles where user_id=?");
-//
-//        return userDetailsManager;
-//    }
-
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
 
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http, AuthenticationSuccessHandler custom) throws Exception {
+    public SecurityFilterChain filterChain(HttpSecurity http, AuthenticationSuccessHandler customSuccessHandler) throws Exception {
 
-        http.authorizeHttpRequests(authorize->
+        http.authorizeHttpRequests(authorize ->
                 authorize
-                        .requestMatchers("/create-account").permitAll()
-                        .requestMatchers("/creatingAccount").permitAll()
-                        .requestMatchers("/showLoginPage").permitAll()
+                        .requestMatchers("/create-account", "/creatingAccount", "/showLoginPage").permitAll()
                         .anyRequest().authenticated()
         ).formLogin(form ->
                 form
                         .loginPage("/showLoginPage")
                         .loginProcessingUrl("/authenticateTheUser")
-                        .successHandler(custom)
+                        .successHandler(customSuccessHandler)
                         .permitAll()
-
-        ).logout(logout -> logout.permitAll()
+        ).logout(logout ->
+                logout.permitAll()
         );
         return http.build();
     }
-
 }

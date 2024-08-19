@@ -10,6 +10,8 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,6 +26,7 @@ public class CompanyService implements UserDetailsService {
     PlaneDAO planeDAO;
     ReservationDAO reservationDAO;
     UserPNRDAO userPNRDAO;
+    private final PasswordEncoder passwordEncoder;
 
     @Autowired
     public CompanyService(UserDAO userDAO, RoleDAO roleDAO, PlaneDAO planeDAO, ReservationDAO reservationDAO, UserPNRDAO userPNRDAO) {
@@ -32,8 +35,12 @@ public class CompanyService implements UserDetailsService {
         this.planeDAO = planeDAO;
         this.reservationDAO = reservationDAO;
         this.userPNRDAO = userPNRDAO;
+        this.passwordEncoder = new BCryptPasswordEncoder();
     }
 
+    public boolean validatePassword(String rawPassword, String encodedPassword) {
+        return passwordEncoder.matches(rawPassword, encodedPassword);
+    }
 
 
     @Transactional
