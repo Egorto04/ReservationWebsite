@@ -450,7 +450,7 @@ public class MainPageController {
             companyService.deleteUserPNR(user.getId());
         }
         companyService.deleteReservation(pnr);
-        return "redirect:/main-page/home";
+        return "redirect:/main-page/reset-everything";
     }
 
     @RequestMapping("/reset-everything")
@@ -467,14 +467,12 @@ public class MainPageController {
     {
         List<UserPNR> passengers = companyService.getFlyersPNR(pnr);
 
-        // Serialize passenger data to JSON
         ObjectMapper objectMapper = new ObjectMapper();
         try {
             String passengerDataJson = objectMapper.writeValueAsString(passengers);
             model.addAttribute("passengerData", passengerDataJson);
         } catch (JsonProcessingException e) {
             e.printStackTrace();
-            // Handle the error appropriately
         }
         return "edit-passenger-info";
     }
