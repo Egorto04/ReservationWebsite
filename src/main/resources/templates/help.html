@@ -26,6 +26,18 @@
             box-sizing: border-box;
             transition: background-color 0.3s ease;
         }
+        input[type="submit"] {
+            width: 100%;
+            background-color: #3498db;
+            color: white;
+            padding: 14px 20px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s ease, transform 0.3s ease;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
 
         .sidebar h2 {
             color: #ecf0f1;
@@ -46,6 +58,21 @@
         .sidebar a:hover {
             background-color: #34495e;
         }
+        .logout-form {
+            margin-top: 30px;
+            text-align: center;
+        }
+
+        .logout-form input[type="submit"] {
+            width: auto;
+            padding: 10px 20px;
+            background-color: #e74c3c;
+        }
+
+        .logout-form input[type="submit"]:hover {
+            background-color: #c0392b;
+        }
+
 
         .content {
             margin-left: 270px;
@@ -111,6 +138,11 @@
     <a href="/section2" th:href="@{/section2}">Reservations</a>
     <a href="/section3" th:href="@{/section3}">User Management</a>
     <a href="/section4" th:href="@{/section4}">Help</a>
+    <div class="logout-form">
+        <form action="#" th:action="@{/logout}" method="post">
+            <input type="submit" value="Logout">
+        </form>
+    </div>
 </div>
 
 <div class="content">

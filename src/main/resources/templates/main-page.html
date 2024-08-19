@@ -288,7 +288,7 @@
             document.getElementById("one_way").addEventListener("change", disappearArrivalDate);
             document.getElementById("roundtrip").addEventListener("change", disappearArrivalDate);
 
-            document.querySelector("input[type='submit']").addEventListener("click", function (event) {
+            document.querySelector("searchSubmitButton").addEventListener("click", function (event) {
                 var departureSelect = document.getElementById("departure");
                 var landingSelect = document.getElementById("landing");
                 var dateSelect = document.getElementById("departureDate");
@@ -321,6 +321,11 @@
     <a href="/section2" th:href="@{/section2}">Reservations</a>
     <a href="/section3" th:href="@{/section3}">User Management</a>
     <a href="/section4" th:href="@{/section4}">Help</a>
+    <div class="logout-form">
+        <form action="#" th:action="@{/logout}" method="post">
+            <input type="submit" value="Logout">
+        </form>
+    </div>
 </div>
 
 <div class="main-content" id="main-content">
@@ -383,14 +388,9 @@
                 </select>
             </div>
 
-            <input type="submit" value="Search">
+            <input type="submit" id="searchSubmitButton" value="Search">
         </form>
 
-        <div class="logout-form">
-            <form action="#" th:action="@{/logout}" method="post">
-                <input type="submit" value="Logout">
-            </form>
-        </div>
     </div>
 </div>
 

@@ -39,8 +39,10 @@ public class ProjectSecurity {
                         .loginProcessingUrl("/authenticateTheUser")
                         .successHandler(customSuccessHandler)
                         .permitAll()
-        ).logout(logout ->
-                logout.permitAll()
+        ).logout(logout -> logout
+                .logoutUrl("/logout")
+                .logoutSuccessUrl("/showLoginPage?logout")
+                .permitAll()
         );
         return http.build();
     }
