@@ -61,6 +61,14 @@
             background-color: #f2f2f2;
         }
 
+        .total-price {
+            text-align: right;
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 20px;
+            color: #2980b9;
+        }
+
         .payment-options {
             text-align: center;
             margin-bottom: 20px;
@@ -84,7 +92,7 @@
         }
 
         input[type="submit"]:hover {
-            background-color: #2980b9;
+            background-color: #1a5981;
         }
 
         .payment-options {
@@ -119,8 +127,6 @@
         .payment-options label:hover {
             background-color: #d5d5d5;
         }
-
-
 
     </style>
 </head>
@@ -181,7 +187,7 @@
             <td th:text="${planeOne.dateDeparture}"></td>
             <td th:text="${planeOne.timeDeparture}"></td>
             <td th:text="${reservation.firstType}"></td>
-            <td th:text="${reservation.firstPrice}+ '$'"></td>
+            <td th:text="${reservation.firstPrice} + '$'"></td>
         </tr>
         <tr th:if="${reservation.flightNumberTwo} != 0">
             <td>Flight Two</td>
@@ -190,10 +196,14 @@
             <td th:text="${planeTwo.dateDeparture}"></td>
             <td th:text="${planeTwo.timeDeparture}"></td>
             <td th:text="${reservation.secondType}"></td>
-            <td th:text="${reservation.secondPrice}+ '$'"></td>
+            <td th:text="${reservation.secondPrice} + '$'"></td>
         </tr>
         </tbody>
     </table>
+
+    <div class="total-price">
+        Total Price: <span th:text="${reservation.firstPrice + (reservation.flightNumberTwo != 0 ? reservation.secondPrice : 0)} + '$'"></span>
+    </div>
 
     <h2>Payment Information</h2>
     <div class="payment-options">
@@ -211,10 +221,6 @@
     <form th:action="@{/main-page/home}">
         <input type="submit" value="Pay Later">
     </form>
-
-
-
-
 </div>
 
 </body>

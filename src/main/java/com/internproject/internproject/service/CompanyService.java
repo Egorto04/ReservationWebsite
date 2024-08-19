@@ -133,12 +133,12 @@ public class CompanyService implements UserDetailsService {
     {
         reservationDAO.changeRes(id);
     }
-//
+
 //    @PostConstruct
 //    public void createPlanes(){
 //        Random rand = new Random();
-//        String[] locations = new String[]{"Ankara","Istanbul","Konya","Izmir","Antalya","Adana","Trabzon","Samsun","Erzurum","Van"};
-//        for (int i = 0; i < 20000; i++) {
+//        String[] locations = new String[]{"Ankara","Istanbul","Izmir","Antalya","Adana","Trabzon","Samsun","Erzurum","Van","Konya"};
+//        for (int i = 0; i < 100000; i++) {
 //            Plane p = new Plane();
 //            int randNum = rand.nextInt(locations.length);
 //            p.setDepartureLocation(locations[randNum]);
@@ -158,7 +158,10 @@ public class CompanyService implements UserDetailsService {
 //            int economySeatAmount = p.getAvailabeSeats()-businessSeatAmount;
 //            p.setBusinessSeat(businessSeatAmount);
 //            p.setEconomySeat(economySeatAmount);
-//            System.out.println(i + ". "+locations[randNum]+"-"+locations[randNum2]);
+//            if (i%10000 == 0)
+//            {
+//                System.out.println(i);
+//            }
 //            int randHour = rand.nextInt(24);
 //            int randMinute = rand.nextInt(12)*5;
 //            String hour = Integer.toString(randHour);

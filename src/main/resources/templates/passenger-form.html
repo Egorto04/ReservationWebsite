@@ -90,6 +90,13 @@
             background-color: #2980b9;
             transform: scale(1.02);
         }
+
+        .error {
+            color: red;
+            font-size: 12px;
+            margin-top: -10px;
+            margin-bottom: 10px;
+        }
     </style>
 </head>
 <body>
@@ -116,7 +123,6 @@
         let childNum = parseInt(document.getElementById("child").value) || 0;
         let infantNum = parseInt(document.getElementById("infant").value) || 0;
 
-        // Calculate the minimum date (100 years ago from today)
         const today = new Date();
         const minDate = new Date(today.getFullYear() - 100, today.getMonth(), today.getDate()).toISOString().split('T')[0];
 
@@ -145,12 +151,15 @@
 
                     <label for="name-${passengerCount}">Name:</label>
                     <input type="text" name="passengers[${passengerCount}].name" id="name-${passengerCount}" required>
+                    <div class="error" id="error-name-${passengerCount}"></div>
 
                     <label for="surname-${passengerCount}">Surname:</label>
                     <input type="text" name="passengers[${passengerCount}].surname" id="surname-${passengerCount}" required>
+                    <div class="error" id="error-surname-${passengerCount}"></div>
 
                     <label for="birthDate-${passengerCount}">Birth Date:</label>
                     <input type="date" name="passengers[${passengerCount}].birthDate" id="birthDate-${passengerCount}" required min="${minDate}">
+                    <div class="error" id="error-birthDate-${passengerCount}"></div>
 
                     <label for="gender-${passengerCount}">Gender:</label>
                     <select name="passengers[${passengerCount}].gender" id="gender-${passengerCount}">
@@ -159,16 +168,20 @@
                     </select>
 
                     <label for="passportNo-${passengerCount}">Passport No:</label>
-                    <input type="text" name="passengers[${passengerCount}].passportNo" id="passportNo-${passengerCount}" required>
+                    <input type="text" name="passengers[${passengerCount}].passportNo" id="passportNo-${passengerCount}" required pattern="^[A-Za-z0-9]{6,9}$" title="Passport number should be 6-9 characters long, containing only letters and numbers.">
+                    <div class="error" id="error-passportNo-${passengerCount}"></div>
 
                     <label for="nationalityNo-${passengerCount}">Nationality No:</label>
-                    <input type="text" name="passengers[${passengerCount}].nationalityNo" id="nationalityNo-${passengerCount}" required>
+                    <input type="text" name="passengers[${passengerCount}].nationalityNo" id="nationalityNo-${passengerCount}" required pattern="^[0-9]{11}$" title="Nationality number should be exactly 11 digits.">
+                    <div class="error" id="error-nationalityNo-${passengerCount}"></div>
 
                     <label for="telNo-${passengerCount}">Tel No:</label>
-                    <input type="text" name="passengers[${passengerCount}].telNo" id="telNo-${passengerCount}" required>
+                    <input type="text" name="passengers[${passengerCount}].telNo" id="telNo-${passengerCount}" required pattern="^[0-9]{10,15}$" title="Phone number should be between 10 and 15 digits.">
+                    <div class="error" id="error-telNo-${passengerCount}"></div>
 
                     <label for="email-${passengerCount}">Email:</label>
                     <input type="email" name="passengers[${passengerCount}].email" id="email-${passengerCount}" required>
+                    <div class="error" id="error-email-${passengerCount}"></div>
                 </fieldset>
             `;
             passengerContainer.appendChild(passengerDiv);
@@ -177,46 +190,122 @@
         document.getElementById('passengerForm').addEventListener('submit', function(event) {
             event.preventDefault();
 
-            let passengers = [];
+            let valid = true;
 
             for (let i = 1; i <= passengerCount; i++) {
-                let passenger = {
-                    name: document.getElementById(`name-${i}`).value,
-                    surname: document.getElementById(`surname-${i}`).value,
-                    birthDate: document.getElementById(`birthDate-${i}`).value,
-                    gender: document.getElementById(`gender-${i}`).value,
-                    passportNo: document.getElementById(`passportNo-${i}`).value,
-                    nationalityNo: document.getElementById(`nationalityNo-${i}`).value,
-                    telNo: document.getElementById(`telNo-${i}`).value,
-                    email: document.getElementById(`email-${i}`).value
-                };
+                const name = document.getElementById(`name-${i}`);
+                const surname = document.getElementById(`surname-${i}`);
+                const birthDate = document.getElementById(`birthDate-${i}`);
+                const passportNo = document.getElementById(`passportNo-${i}`);
+                const nationalityNo = document.getElementById(`nationalityNo-${i}`);
+                const telNo = document.getElementById(`telNo-${i}`);
+                const email = document.getElementById(`email-${i}`);
 
-                passengers.push(passenger);
+                clearErrors(i);
+
+                if (!validateText(name)) valid = false;
+                if (!validateText(surname)) valid = false;
+                if (!validateDate(birthDate)) valid = false;
+                if (!validatePattern(passportNo)) valid = false;
+                if (!validatePattern(nationalityNo)) valid = false;
+                if (!validatePattern(telNo)) valid = false;
+                if (!validateEmail(email)) valid = false;
             }
 
-            console.log(passengers);
-            fetch('/main-page/submit-passenger-data', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    [csrfHeader]: csrfToken
-                },
-                body: JSON.stringify(passengers)
-            })
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error('Network response was not ok');
-                    }
-                    window.location.href = "/main-page/payment";
-                    return response.json();
+            if (valid) {
+                let passengers = [];
+
+                for (let i = 1; i <= passengerCount; i++) {
+                    let passenger = {
+                        name: document.getElementById(`name-${i}`).value,
+                        surname: document.getElementById(`surname-${i}`).value,
+                        birthDate: document.getElementById(`birthDate-${i}`).value,
+                        gender: document.getElementById(`gender-${i}`).value,
+                        passportNo: document.getElementById(`passportNo-${i}`).value,
+                        nationalityNo: document.getElementById(`nationalityNo-${i}`).value,
+                        telNo: document.getElementById(`telNo-${i}`).value,
+                        email: document.getElementById(`email-${i}`).value
+                    };
+
+                    passengers.push(passenger);
+                }
+
+                console.log(passengers);
+                fetch('/main-page/submit-passenger-data', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        [csrfHeader]: csrfToken
+                    },
+                    body: JSON.stringify(passengers)
                 })
-                .then(data => {
-                    console.log(data);
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                });
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Network response was not ok');
+                        }
+                        window.location.href = "/main-page/payment";
+                        return response.json();
+                    })
+                    .then(data => {
+                        console.log(data);
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                    });
+            }
         });
+
+        function validateText(input) {
+            if (input.value.trim() === "") {
+                showError(input.id, "This field is required.");
+                return false;
+            }
+            return true;
+        }
+
+        function validateDate(input) {
+            if (input.value.trim() === "" || new Date(input.value) > today) {
+                showError(input.id, "Please enter a valid birth date.");
+                return false;
+            }
+            return true;
+        }
+
+        function validatePattern(input) {
+            if (!input.checkValidity()) {
+                showError(input.id, input.title);
+                return false;
+            }
+            return true;
+        }
+
+        function validateEmail(input) {
+            if (input.value.trim() === "" || !input.checkValidity()) {
+                showError(input.id, "Please enter a valid email address.");
+                return false;
+            }
+            return true;
+        }
+
+        function showError(inputId, message) {
+            document.getElementById(`error-${inputId}`).innerText = message;
+        }
+
+        function clearErrors(passengerIndex) {
+            const errorFields = [
+                `error-name-${passengerIndex}`,
+                `error-surname-${passengerIndex}`,
+                `error-birthDate-${passengerIndex}`,
+                `error-passportNo-${passengerIndex}`,
+                `error-nationalityNo-${passengerIndex}`,
+                `error-telNo-${passengerIndex}`,
+                `error-email-${passengerIndex}`
+            ];
+
+            errorFields.forEach(fieldId => {
+                document.getElementById(fieldId).innerText = "";
+            });
+        }
     });
 </script>
 

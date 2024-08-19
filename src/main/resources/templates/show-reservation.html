@@ -29,42 +29,56 @@
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
         }
 
-        table {
-            width: 100%;
-            border-collapse: collapse;
+        .info-section {
             margin-bottom: 20px;
-            background-color: #fff;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
-            border-radius: 8px;
-            overflow: hidden;
-            border: 1px solid #ddd; /* Add this for visible borders */
         }
 
-        th, td {
-            padding: 15px;
-            text-align: left;
-            border: 1px solid #ddd; /* Add this for visible borders */
-        }
-
-        th {
-            background-color: #3498db;
-            color: white;
-            text-align: center;
-            font-size: 16px;
-        }
-
-        td {
+        .card {
             background-color: #f9f9f9;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+            margin-bottom: 20px;
+        }
+
+        .card h3 {
+            margin-top: 0;
+            font-size: 20px;
+            color: #3498db;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 10px;
+        }
+
+        .card .info-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .info-item {
+            background-color: #fff;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .info-label {
+            font-weight: bold;
             color: #2c3e50;
-            font-size: 15px;
         }
 
-        tr:nth-child(even) td {
-            background-color: #f2f2f2;
+        .btn-container {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
         }
 
-        tr:hover td {
-            background-color: #e8e8e8;
+        .btn-container form {
+            flex-grow: 1;
+            margin: 0 10px;
         }
 
         input[type="submit"] {
@@ -84,18 +98,11 @@
             transform: scale(1.02);
         }
 
-        .btn-container {
-            display: flex;
-            justify-content: space-between;
-            margin-top: 20px;
-        }
-
-        .btn-container form {
-            flex-grow: 1;
-            margin: 0 10px;
-        }
-
         @media (max-width: 768px) {
+            .info-grid {
+                grid-template-columns: 1fr; /* Stack items on smaller screens */
+            }
+
             .btn-container {
                 flex-direction: column;
                 gap: 10px;
@@ -117,70 +124,110 @@
     <h2>PNR Code for the reservation</h2>
     <h2 th:text="${reservation.pnrCode}"></h2>
 
-    <h2>Passenger Information</h2>
-    <table>
-        <thead>
-        <tr>
-            <th>Type</th>
-            <th>Name</th>
-            <th>Surname</th>
-            <th>Birth Date</th>
-            <th>Gender</th>
-            <th>Passport No</th>
-            <th>Nationality No</th>
-            <th>Tel No</th>
-            <th>Email</th>
-        </tr>
-        </thead>
-        <tbody>
-        <tr th:each="user : ${users}">
-            <td th:text="${user.personType}"></td>
-            <td th:text="${user.name}"></td>
-            <td th:text="${user.surname}"></td>
-            <td th:text="${user.birthDate}"></td>
-            <td th:text="${user.gender}"></td>
-            <td th:text="${user.passportNo}"></td>
-            <td th:text="${user.nationalityNo}"></td>
-            <td th:text="${user.telNo}"></td>
-            <td th:text="${user.email}"></td>
-        </tr>
-        </tbody>
-    </table>
+    <div class="info-section">
+        <h2>Passenger Information</h2>
+        <div th:each="user : ${users}" class="card">
+            <h3 th:text="${user.personType} + ' Passenger'"></h3>
+            <div class="info-grid">
+                <div class="info-item">
+                    <span class="info-label">Name:</span>
+                    <span th:text="${user.name}"></span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Surname:</span>
+                    <span th:text="${user.surname}"></span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Birth Date:</span>
+                    <span th:text="${user.birthDate}"></span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Gender:</span>
+                    <span th:text="${user.gender}"></span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Passport No:</span>
+                    <span th:text="${user.passportNo}"></span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Nationality No:</span>
+                    <span th:text="${user.nationalityNo}"></span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Tel No:</span>
+                    <span th:text="${user.telNo}"></span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Email:</span>
+                    <span th:text="${user.email}"></span>
+                </div>
+            </div>
+        </div>
+    </div>
 
-    <h2>Flight Information</h2>
-    <table>
-        <thead>
-        <tr>
-            <th>Plane</th>
-            <th>Departure</th>
-            <th>Landing</th>
-            <th>Date of Departure</th>
-            <th>Departure Time</th>
-            <th>Class</th>
-            <th>Price</th>
-        </tr>
-        </thead>
-        <tbody>
-        <tr>
-            <td>Flight One</td>
-            <td th:text="${planeOne.departureLocation}"></td>
-            <td th:text="${planeOne.landingLocation}"></td>
-            <td th:text="${planeOne.dateDeparture}"></td>
-            <td th:text="${planeOne.timeDeparture}"></td>
-            <td th:text="${reservation.firstType}"></td>
-            <td th:text="${reservation.firstPrice} + '$'"></td>
-        </tr>
-        <tr th:if="${reservation.flightNumberTwo} != 0">
-            <td>Flight Two</td>
-            <td th:text="${planeTwo.departureLocation}"></td>
-            <td th:text="${planeTwo.landingLocation}"></td>
-            <td th:text="${planeTwo.dateDeparture}"></td>
-            <td th:text="${planeTwo.timeDeparture}"></td>
-            <td th:text="${reservation.secondType}"></td>
-            <td th:text="${reservation.secondPrice} + '$'"></td>
-        </tr>
-        </tbody>
-    </table>
+    <div class="info-section">
+        <h2>Flight Information</h2>
+        <div class="card">
+            <h3>Flight One</h3>
+            <div class="info-grid">
+                <div class="info-item">
+                    <span class="info-label">Departure:</span>
+                    <span th:text="${planeOne.departureLocation}"></span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Landing:</span>
+                    <span th:text="${planeOne.landingLocation}"></span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Date of Departure:</span>
+                    <span th:text="${planeOne.dateDeparture}"></span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Departure Time:</span>
+                    <span th:text="${planeOne.timeDeparture}"></span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Class:</span>
+                    <span th:text="${reservation.firstType}"></span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Price:</span>
+                    <span th:text="${reservation.firstPrice} + '$'"></span>
+                </div>
+            </div>
+        </div>
+
+        <div class="card" th:if="${reservation.flightNumberTwo} != 0">
+            <h3>Flight Two</h3>
+            <div class="info-grid">
+                <div class="info-item">
+                <div class="info-item">
+                    <span class="info-label">Departure:</span>
+                    <span th:text="${planeTwo.departureLocation}"></span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Landing:</span>
+                    <span th:text="${planeTwo.landingLocation}"></span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Date of Departure:</span>
+                    <span th:text="${planeTwo.dateDeparture}"></span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Departure Time:</span>
+                    <span th:text="${planeTwo.timeDeparture}"></span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Class:</span>
+                    <span th:text="${reservation.secondType}"></span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Price:</span>
+                    <span th:text="${reservation.secondPrice} + '$'"></span>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <div class="btn-container">
         <form th:action="@{/main-page/cancel-reservation}" th:object="${reservation}" method="post">

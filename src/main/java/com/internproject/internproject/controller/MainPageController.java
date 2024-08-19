@@ -254,6 +254,10 @@ public class MainPageController {
             }
         }
 
+        companyService.getFlyersPNR(reservation.getPnrCode()).forEach(userPNR -> {
+            companyService.deleteUserPNR(userPNR.getId());
+        });
+
         int totalPas = flightInfo.getAdult() + flightInfo.getInfant() + flightInfo.getChild();
 
         firstPrice = firstPrice*totalPas;
@@ -268,6 +272,8 @@ public class MainPageController {
 
         List<UserPNR> users = new ArrayList<>();
         String[] types = new String[30];
+
+
 
         for (int i = 0; i < flightInfo.getAdult(); i++) {
             users.add(new UserPNR());
@@ -390,17 +396,17 @@ public class MainPageController {
         Reservation reservation1 = companyService.findReservation(pnr);
         List<UserPNR> users = companyService.getFlyersPNR(pnr);
         companyService.changeReservationStatus(pnr);
-        Plane p1 = companyService.findById(reservation.getFlightNumberOne());
-        companyService.reduceSeat(p1, users.size(), reservation.getFirstType());
-        if (reservation.getFlightNumberTwo() != 0) {
-            Plane p2 = companyService.findById(reservation.getFlightNumberTwo());
-            companyService.reduceSeat(p2, users.size(), reservation.getSecondType());
+        Plane p1 = companyService.findById(reservation1.getFlightNumberOne());
+        companyService.reduceSeat(p1, users.size(), reservation1.getFirstType());
+        if (reservation1.getFlightNumberTwo() != 0) {
+            Plane p2 = companyService.findById(reservation1.getFlightNumberTwo());
+            companyService.reduceSeat(p2, users.size(), reservation1.getSecondType());
         }
         model.addAttribute("reservation", reservation1);
         model.addAttribute("users", users);
         model.addAttribute("planeOne", companyService.findById(reservation1.getFlightNumberOne()));
         model.addAttribute("planeTwo", companyService.findById(reservation1.getFlightNumberTwo()));
-        return "reservation-confirmation";
+        return "show-reservation";
     }
     @RequestMapping("/find-reservation")
     public String findReservation(Model model) {
