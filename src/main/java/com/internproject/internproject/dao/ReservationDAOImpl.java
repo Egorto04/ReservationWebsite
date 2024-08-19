@@ -26,6 +26,11 @@ public class ReservationDAOImpl implements ReservationDAO{
     }
 
     @Override
+    public String getCreator(String id) {
+        return "";
+    }
+
+    @Override
     public List<Reservation> findAll() {
         return List.of();
     }

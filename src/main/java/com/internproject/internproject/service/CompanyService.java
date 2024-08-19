@@ -145,7 +145,7 @@ public class CompanyService implements UserDetailsService {
 //    public void createPlanes(){
 //        Random rand = new Random();
 //        String[] locations = new String[]{"Ankara","Istanbul","Izmir","Antalya","Adana","Trabzon","Samsun","Erzurum","Van","Konya"};
-//        for (int i = 0; i < 100000; i++) {
+//        for (int i = 0; i < 10000; i++) {
 //            Plane p = new Plane();
 //            int randNum = rand.nextInt(locations.length);
 //            p.setDepartureLocation(locations[randNum]);

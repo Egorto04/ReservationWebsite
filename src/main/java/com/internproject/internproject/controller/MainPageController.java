@@ -13,6 +13,8 @@ import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
@@ -170,10 +172,17 @@ public class MainPageController {
     @RequestMapping("/look-for-reservation")
     public String lookForReservation(@RequestParam("paymentId") String pnr, RedirectAttributes redirectAttributes)
     {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = authentication.getName();
         if (companyService.findReservation(pnr) != null)
         {
             if (companyService.findReservation(pnr).getStatus() != null) {
                 redirectAttributes.addFlashAttribute("error", "Reservation already ticketed");
+                return "redirect:/main-page/payment-search";
+            }
+            if (!companyService.findReservation(pnr).getCreator().equals(username))
+            {
+                redirectAttributes.addFlashAttribute("error", "Reservation is not yours!");
                 return "redirect:/main-page/payment-search";
             }
             return "redirect:/main-page/make-payment?pnrCode="+pnr;
@@ -220,7 +229,6 @@ public class MainPageController {
         redirectAttributes.addFlashAttribute("error", "Please select a valid plane time");
         if (flightInfo.getDepartureDate().getTime() == flightInfo.getArrivalDate().getTime())
         {
-
             System.out.println(p1.getTimeDeparture().compareTo(p2.getTimeDeparture()));
             if (p1.getTimeDeparture().compareTo(p2.getTimeDeparture()) < 0)
             {
@@ -305,6 +313,11 @@ public class MainPageController {
     @RequestMapping("/reservation-info")
     public String reservationForm()
     {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        // Get the username of the logged-in user
+        String username = authentication.getName();
+
         for (UserPNR user: users)
         {
             user.setPnr(reservation.getPnrCode());
@@ -325,6 +338,7 @@ public class MainPageController {
         {
             companyService.savePNR(user);
         }
+        reservation.setCreator(username);
         companyService.saveReservation(reservation);
         return "redirect:/main-page/payment";
     }
@@ -424,6 +438,15 @@ public class MainPageController {
     public String findPNRReservation(@RequestParam("pnrCode") String pnr, RedirectAttributes redirectAttributes, Model model) {
         if (companyService.findReservation(pnr) == null) {
             redirectAttributes.addFlashAttribute("error", "No reservation found");
+            return "redirect:/main-page/find-reservation";
+        }
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = authentication.getName();
+        System.out.println(username);
+        System.out.println(companyService.findReservation(pnr).getCreator());
+        if (!companyService.findReservation(pnr).getCreator().equals(username))
+        {
+            redirectAttributes.addFlashAttribute("error", "Reservation is not yours!");
             return "redirect:/main-page/find-reservation";
         }
         Reservation reservation = companyService.findReservation(pnr);

@@ -34,8 +34,10 @@ public class Reservation {
     @Column(name = "second_price")
     private int secondPrice;
 
-    public Reservation(String pnrCode, int flightNumberOne, int flightNumberTwo, String firstType, String secondType, String status, int firstPrice, int secondPrice) {
-        this.pnrCode = pnrCode;
+    @Column(name = "creator")
+    private String creator;
+
+    public Reservation(int flightNumberOne, int flightNumberTwo, String firstType, String secondType, String status, int firstPrice, int secondPrice, String creator) {
         this.flightNumberOne = flightNumberOne;
         this.flightNumberTwo = flightNumberTwo;
         this.firstType = firstType;
@@ -43,6 +45,7 @@ public class Reservation {
         this.status = status;
         this.firstPrice = firstPrice;
         this.secondPrice = secondPrice;
+        this.creator = creator;
     }
 
     public Reservation() {
@@ -110,6 +113,14 @@ public class Reservation {
 
     public void setSecondPrice(int secondPrice) {
         this.secondPrice = secondPrice;
+    }
+
+    public String getCreator() {
+        return creator;
+    }
+
+    public void setCreator(String creator) {
+        this.creator = creator;
     }
 
     @Override

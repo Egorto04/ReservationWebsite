@@ -10,6 +10,8 @@ public interface ReservationDAO {
 
     public Reservation findById(String id);
 
+    public String getCreator(String id);
+
     public List<Reservation> findAll();
 
     public void delete(String id);
