@@ -388,19 +388,52 @@ public class MainPageController {
         return "redirect:/main-page/user-management";
     }
 
+    @RequestMapping("/delete-profile")
+    public String deleteProfile(){
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = authentication.getName();
+        companyService.deleteUser(username);
+        List<Reservation> reservations = companyService.getPNRs(username);
+        for (Reservation reservation : reservations)
+        {
+            companyService.deleteReservation(reservation.getPnrCode());
+            List<UserPNR> users = companyService.getFlyersPNR(reservation.getPnrCode());
+            for (UserPNR userPNR: users)
+            {
+                companyService.deleteUserPNR(userPNR.getId());
+            }
+        }
+        return "redirect:/showLoginPage?logout";
+    }
     @RequestMapping("/delete-user")
     public String delete(@RequestParam("delUsername") String username, RedirectAttributes redirectAttributes)
     {
         User user = companyService.findUserByUsername(username);
-        if (user == null)
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username1 = authentication.getName();
+        if (username1.equals(username)) {
+            redirectAttributes.addFlashAttribute("error1", "You cannot delete yourself");
+        }else if (user == null)
         {
             redirectAttributes.addFlashAttribute("error1", "User not found");
         }else{
             companyService.deleteUser(username);
             redirectAttributes.addFlashAttribute("error1", "User deleted successfully");
         }
+        List<Reservation> pnrs = companyService.getPNRs(username);
+        for (Reservation pnr: pnrs)
+        {
+            companyService.deleteReservation(pnr.getPnrCode());
+            List<UserPNR> users = companyService.getFlyersPNR(pnr.getPnrCode());
+            for (UserPNR userPNR: users)
+            {
+                companyService.deleteUserPNR(userPNR.getId());
+            }
+        }
         return "redirect:/main-page/user-management";
     }
+
+
     @RequestMapping("/user-management")
     public String userManagement(Model model)
     {

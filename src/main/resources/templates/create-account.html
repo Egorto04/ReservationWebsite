@@ -90,29 +90,95 @@
                 transform: translateY(0);
             }
         }
+
+        .password-container {
+            position: relative;
+        }
+
+        .toggle-password {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 14px;
+            color: #3498db;
+        }
+        .toggle-password1 {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 14px;
+            color: #3498db;
+        }
+
     </style>
+    <script>
+        function togglePasswordVisibility() {
+            var passwordInput = document.getElementById("password");
+            var toggleButton = document.querySelector(".toggle-password");
+            if (passwordInput.type === "password") {
+                passwordInput.type = "text";
+                toggleButton.textContent = "Hide";
+            } else {
+                passwordInput.type = "password";
+                toggleButton.textContent = "Show";
+            }
+        }
+
+            function toggleConfirmPasswordVisibility() {
+                var passwordInput = document.getElementById("confirmPassword");
+                var toggleButton = document.querySelector(".toggle-password1");
+                if (passwordInput.type === "password") {
+                    passwordInput.type = "text";
+                    toggleButton.textContent = "Hide";
+                } else {
+                    passwordInput.type = "password";
+                    toggleButton.textContent = "Show";
+                }
+            }
+
+    </script>
 </head>
 <body>
 
 <div class="account-container">
     <h2>Create Account</h2>
+    <div th:if="${error}">
+        <span th:text="${error}" class="error-message"></span>
+    </div>
     <form th:action="@{/creatingAccount}" th:object="${webUser}" method="post">
-
-        <input type="text" th:field="*{firstName}" placeholder="First Name" required>
+        <input type="text" th:field="*{firstName}" name="firstName" placeholder="First Name" required>
         <div th:if="${#fields.hasErrors('firstName')}" th:errors="*{firstName}" class="error-message"></div>
 
-        <input type="text" th:field="*{lastName}" placeholder="Last Name" required>
+        <input type="text" th:field="*{lastName}" name="lastName" placeholder="Last Name" required>
         <div th:if="${#fields.hasErrors('lastName')}" th:errors="*{lastName}" class="error-message"></div>
 
-        <input type="text" th:field="*{username}" placeholder="Username" required>
+        <input type="text" th:field="*{username}" name="username"  placeholder="Username" required>
         <div th:if="${#fields.hasErrors('username')}" th:errors="*{username}" class="error-message"></div>
 
-        <input type="email" th:field="*{email}" placeholder="Email" required>
+        <input type="email" th:field="*{email}" name="email" placeholder="Email" required>
         <div th:if="${#fields.hasErrors('email')}" th:errors="*{email}" class="error-message"></div>
 
-        <input type="password" th:field="*{password}" placeholder="Password" required>
-        <div th:if="${#fields.hasErrors('password')}" th:errors="*{password}" class="error-message"></div>
+        <div class="password-container">
+            <input type="password" name="password" id="password" th:field="*{password}" placeholder="Password"
+                   pattern="(?=.*\d)(?=.*[A-Z]).{8,}"
+                   title="Password must be at least 8 characters long and contain at least one uppercase letter and one number."
+                   required>
+            <button type="button" class="toggle-password" onclick="togglePasswordVisibility()">Show</button>
+        </div>
 
+        <div class="password-container">
+            <input type="password" name="confirmPassword" id="confirmPassword" placeholder="Confirm Password">
+            <button type="button" class="toggle-password1" onclick="toggleConfirmPasswordVisibility()">Show</button>
+
+        </div>
         <input type="submit" value="Create Account">
     </form>
 </div>
