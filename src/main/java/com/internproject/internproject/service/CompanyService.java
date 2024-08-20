@@ -145,7 +145,7 @@ public class CompanyService implements UserDetailsService {
 //    public void createPlanes(){
 //        Random rand = new Random();
 //        String[] locations = new String[]{"Ankara","Istanbul","Izmir","Antalya","Adana","Trabzon","Samsun","Erzurum","Van","Konya"};
-//        for (int i = 0; i < 10000; i++) {
+//        for (int i = 0; i < 100000; i++) {
 //            Plane p = new Plane();
 //            int randNum = rand.nextInt(locations.length);
 //            p.setDepartureLocation(locations[randNum]);
@@ -191,7 +191,10 @@ public class CompanyService implements UserDetailsService {
 //            planeDAO.save(p);
 //        }
 //    }
-
+    public List<Reservation> getPNRs(String creator)
+    {
+        return reservationDAO.findByCreator(creator);
+    }
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {

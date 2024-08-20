@@ -410,9 +410,9 @@ public class MainPageController {
     @RequestMapping("/reservation-confirmed")
     public String reservationConfirmed(@RequestParam("pnrCode") String pnr, Model model)
     {
+        companyService.changeReservationStatus(pnr);
         Reservation reservation1 = companyService.findReservation(pnr);
         List<UserPNR> users = companyService.getFlyersPNR(pnr);
-        companyService.changeReservationStatus(pnr);
         Plane p1 = companyService.findById(reservation1.getFlightNumberOne());
         companyService.reduceSeat(p1, users.size(), reservation1.getFirstType());
         if (reservation1.getFlightNumberTwo() != 0) {
@@ -431,6 +431,12 @@ public class MainPageController {
             model.addAttribute("error", model.getAttribute("error"));
         }
         model.addAttribute("reservation", new Reservation());
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = authentication.getName();
+        if (companyService.getPNRs(username) != null)
+        {
+            model.addAttribute("pnrCodes", companyService.getPNRs(username));
+        }
         return "find-reservation";
     }
 
