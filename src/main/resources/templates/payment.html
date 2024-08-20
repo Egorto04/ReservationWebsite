@@ -218,7 +218,8 @@
         <input type="submit" th:value="Pay">
     </form>
     <br>
-    <form th:action="@{/main-page/home}">
+    <form th:action="@{/main-page/reset-everything}">
+        <input type="hidden" name="address" value="/main-page/home">
         <input type="submit" value="Pay Later">
     </form>
 </div>
