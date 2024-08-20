@@ -94,6 +94,22 @@
         input[type="submit"]:hover {
             background-color: #1a5981;
         }
+        input[type="button"] {
+            padding: 12px 20px;
+            background-color:  #2980b9;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            display: block;
+            width: 100%;
+        }
+
+        input[type="button"]:hover {
+            background-color: #1a5981;
+        }
+
 
         .payment-options {
             display: flex;
@@ -127,8 +143,79 @@
         .payment-options label:hover {
             background-color: #d5d5d5;
         }
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.5);
+            justify-content: center;
+            align-items: center;
+        }
 
+        .modal-content {
+            background-color: #fefefe;
+            padding: 20px;
+            border-radius: 8px;
+            width: 300px;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .modal-button {
+            padding: 10px 20px;
+            margin: 10px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        .modal-button.confirm {
+            background-color: #41c933;
+            color: white;
+        }
+
+        .modal-button.cancel {
+            background-color: #bdc3c7;
+            color: white;
+        }
+
+        .modal-button.confirm:hover {
+            background-color: #48983f;
+        }
+
+        .modal-button.cancel:hover {
+            background-color: #95a5a6;
+        }
     </style>
+    <script>
+        function showModal() {
+            var modal = document.getElementById("confirmationModal");
+            modal.style.display = "flex";
+        }
+
+        function closeModal() {
+            var modal = document.getElementById("confirmationModal");
+            modal.style.display = "none";
+        }
+
+        function confirmDeleteProfile() {
+            closeModal();
+            document.getElementById("payReservation").submit();
+        }
+
+        window.onclick = function(event) {
+            var modal = document.getElementById("confirmationModal");
+            if (event.target === modal) {
+                closeModal();
+            }
+        }
+    </script>
 </head>
 <body>
 
@@ -213,10 +300,21 @@
         <input type="radio" id="credit-card" name="paymentType" value="Credit Card" required>
         <label for="credit-card">Credit Card</label>
     </div>
-    <form th:action="@{/main-page/reservation-confirmed}" method="post">
+    <form id="payReservation" th:action="@{/main-page/reservation-confirmed}" method="post">
         <input type="hidden" id="pnrCode" name="pnrCode" th:value="${reservation.pnrCode}">
-        <input type="submit" th:value="Pay">
+        <input type="button" value="Pay" onclick="showModal()">
     </form>
+    <div id="confirmationModal" class="modal">
+        <div class="modal-content">
+            <h3>Are you sure?</h3>
+            <p>There is no refund beyond this point</p>
+            <p>This action cannot be undone.</p>
+            Total Price: <span th:text="${reservation.firstPrice + (reservation.flightNumberTwo != 0 ? reservation.secondPrice : 0)} + '$'"></span>
+            <br><br>
+            <button class="modal-button confirm" onclick="confirmDeleteProfile()">Yes, Pay</button>
+            <button class="modal-button cancel" onclick="closeModal()">No</button>
+        </div>
+    </div>
     <br>
     <form th:action="@{/main-page/reset-everything}">
         <input type="hidden" name="address" value="/main-page/home">
