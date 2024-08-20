@@ -531,6 +531,7 @@ public class MainPageController {
         ObjectMapper objectMapper = new ObjectMapper();
         try {
             String passengerDataJson = objectMapper.writeValueAsString(passengers);
+            model.addAttribute("pnrCode", pnr);
             model.addAttribute("passengerData", passengerDataJson);
         } catch (JsonProcessingException e) {
             e.printStackTrace();
