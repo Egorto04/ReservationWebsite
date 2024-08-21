@@ -80,6 +80,7 @@
             margin-bottom: 30px;
         }
 
+
         label {
             display: block;
             margin-bottom: 8px;
@@ -289,7 +290,7 @@
 
         window.onload = function () {
             setMinDepartureDate();
-
+            disappearArrivalDate();
             var departureDateInput = document.getElementById("departureDate");
             if (departureDateInput.value) {
                 updateArrivalDateMin();
@@ -347,15 +348,24 @@
 
 <div class="main-content" id="main-content">
     <div class="container">
-        <h1>Search Plane</h1>
-
+        <h1>Change Reservation</h1>
+        <h1>PNR Code</h1>
+        <h1 th:text="${reservation.pnrCode}"></h1>
         <form action="#" th:action="@{/main-page/checkValid}" th:object="${flight}" method="post">
             <div th:if="${error}" class="error-message" th:text="${error}"></div>
             <div class="radio-group">
-                <input type="radio" id="one_way" name="choice" th:field="*{direction}" value="One-Way" required>
+                <input type="radio" id="one_way" name="choice"
+                       th:field="*{direction}"
+                       value="One-Way"
+                       th:checked="${flight.direction == 'One-Way'}"
+                       required>
                 <label for="one_way">One-Way</label>
 
-                <input type="radio" id="roundtrip" name="choice" th:field="*{direction}" value="Roundtrip" required>
+                <input type="radio" id="roundtrip" name="choice"
+                       th:field="*{direction}"
+                       value="Roundtrip"
+                       th:checked="${flight.direction == 'Roundtrip'}"
+                       required>
                 <label for="roundtrip">Roundtrip</label>
             </div>
 
@@ -386,21 +396,25 @@
             <div class="form-group">
                 <label for="adult">Adult Number</label>
                 <select id="adult" th:field="*{adult}" required>
-                    <option th:each="num: ${numbers}" th:value="${num}" th:text="${num}"></option>
+                    <option th:each="num: ${numbers}" th:value="${num}" th:text="${num}"
+                            th:selected="${num} != *{adult}"></option>
                 </select>
             </div>
 
             <div class="form-group">
                 <label for="child">Child Number</label>
                 <select id="child" th:field="*{child}">
-                    <option th:each="num: ${numbers}" th:value="${num}" th:text="${num}"></option>
+                    <option th:each="num: ${numbers}"
+                            th:value="${num}"
+                            th:text="${num}"></option>
                 </select>
             </div>
 
             <div class="form-group">
                 <label for="infant">Infant Number</label>
                 <select id="infant" th:field="*{infant}">
-                    <option th:each="num: ${numbers}" th:value="${num}" th:text="${num}"></option>
+                    <option th:each="num: ${numbers}" th:value="${num}"  th:text="${num}"
+                            th:selected="${num} != *{infant}"></option>
                 </select>
             </div>
 

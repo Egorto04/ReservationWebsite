@@ -201,6 +201,19 @@
             font-size: 18px;
             color: #e74c3c;
         }
+        .profile-box {
+            background-color: #34495e;
+            padding: 10px;
+            border-radius: 6px;
+            text-align: center;
+            font-size: 14px;
+            margin-top: 20px;
+            color: #ecf0f1;
+        }
+
+        .profile-box span {
+            font-weight: bold;
+        }
 
     </style>
 </head>
@@ -212,11 +225,17 @@
     <a href="/section2" th:href="@{/section2}">Reservations</a>
     <a href="/section3" th:href="@{/section3}">User Management</a>
     <a href="/section4" th:href="@{/section4}">Help</a>
+    <div class="profile-box">
+        Logged in as: <span sec:authentication="principal.username"></span>
+    </div>
     <div class="logout-form">
         <form action="#" th:action="@{/logout}" method="post">
             <input type="submit" value="Logout">
         </form>
     </div>
+
+
+
 
 </div>
 

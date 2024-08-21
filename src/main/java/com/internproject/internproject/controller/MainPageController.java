@@ -51,12 +51,25 @@ public class MainPageController {
 
     private Reservation reservation;
 
+    private Reservation editReservation;
+
     private boolean isRoundTrip;
+
+    private boolean editing;
+
+    private boolean changedPassengerCount;
 
     private List<UserPNR> users;
 
+    private int newAdult;
+    private int newChild;
+    private int newInfant;
+
+
     @RequestMapping("/home")
     public String home(Model model, @ModelAttribute("error") String error) {
+        editing = false;
+        changedPassengerCount = false;
         if (reservation == null)
         {
             reservation = new Reservation();
@@ -75,12 +88,55 @@ public class MainPageController {
         }
         return "main-page";
     }
+    @RequestMapping("/edit-reservation")
+    public String editReservation(@RequestParam("pnrCode") String pnr, Model model) {
+        editing = true;
+        Reservation reservation = companyService.findReservation(pnr);
+        editReservation = reservation;
+        List<UserPNR> users = companyService.getFlyersPNR(pnr);
+        flightInfo = new FlightInfo();
+        int adult = 0;
+        int child = 0;
+        int infant = 0;
+        for (UserPNR user: users)
+        {
+            if (user.getPersonType().equals("Adult"))
+            {
+                adult++;
+            }else if (user.getPersonType().equals("Child")) {
+                child++;
+            }else {
+                infant++;
+            }
+        }
+        flightInfo.setAdult(adult);
+        flightInfo.setChild(child);
+        flightInfo.setInfant(infant);
+        Plane p = companyService.findById(editReservation.getFlightNumberOne());
+        flightInfo.setDeparture(p.getDepartureLocation());
+        flightInfo.setLanding(p.getLandingLocation());
+        flightInfo.setDepartureDate(p.getDateDeparture());
+        if (reservation.getFlightNumberTwo() != 0)
+        {
+            flightInfo.setDirection("Roundtrip");
+            Plane p2 = companyService.findById(editReservation.getFlightNumberTwo());
+            flightInfo.setArrivalDate(p2.getDateDeparture());
+        }else{
+            flightInfo.setDirection("One-Way");
+        }
+        System.out.println(flightInfo.getDirection());
+        model.addAttribute("countries", countries);
+        model.addAttribute("numbers", numbers);
+        model.addAttribute("reservation", reservation);
+        model.addAttribute("flight", flightInfo);
+        return "edit-reservation";
+    }
+
     @RequestMapping("/searchplane")
     public String searchPlane( Model model,  @ModelAttribute("error") String error) {
         List<Plane> planes = companyService.findPlane(flightInfo.getDeparture(),flightInfo.getLanding(),flightInfo.getDepartureDate());
         model.addAttribute("planes", planes);
         model.addAttribute("error", error);
-        int adult = flightInfo.getInfant();
         model.addAttribute("flight", flightInfo);
         return "departure-plane-show";
     }
@@ -89,8 +145,14 @@ public class MainPageController {
     public String processDeparture(@RequestParam("planeId") int planeId,
                                    Model model, RedirectAttributes redirectAttributes)  {
         Plane p = companyService.findById(planeId);
-        reservation.setFlightNumberOne(planeId);
-        reservation.setFlightNumberTwo(0);
+        if (editing)
+        {
+            editReservation.setFlightNumberOne(planeId);
+            editReservation.setFlightNumberTwo(0);
+        }else{
+            reservation.setFlightNumberOne(planeId);
+            reservation.setFlightNumberTwo(0);
+        }
 
         if (flightInfo.getDirection().equals("Roundtrip"))
         {
@@ -106,27 +168,118 @@ public class MainPageController {
     @GetMapping("/seatSelection")
     public String seatSelection(Model model)
     {
-        Plane p1 = companyService.findById(reservation.getFlightNumberOne());
-        if (reservation.getFlightNumberTwo() != 0)
+        if (editing)
         {
-            Plane p2 = companyService.findById(reservation.getFlightNumberTwo());
+            Plane p1 = companyService.findById(editReservation.getFlightNumberOne());
+            Plane p2;
+            if (editReservation.getFlightNumberTwo() != 0)
+            {
+                p2 = companyService.findById(editReservation.getFlightNumberTwo());
+                System.out.println(p2);
+            }else{
+                p2 = new Plane();
+                p2.setEconomyPrice(0);
+                p2.setBussinessPrice(0);
+            }
             model.addAttribute("flightTwo", p2);
+            model.addAttribute("flightOne", p1);
+            model.addAttribute("isRoundTrip", isRoundTrip);
+            model.addAttribute("reservation", editReservation);
+            model.addAttribute("address", "/main-page/save-res");
+            System.out.println(editing);
+            System.out.println(changedPassengerCount);
+            if (changedPassengerCount)
+            {
+                model.addAttribute("address",   "/main-page/edit-passenger-info?pnrCode=" +editReservation.getPnrCode());
+            }
+            return "seat-selection-show";
         }else{
-            Plane p2 = new Plane();
-            p2.setEconomyPrice(0);
-            p2.setBussinessPrice(0);
-            model.addAttribute("flightTwo", p2);
+            Plane p1 = companyService.findById(reservation.getFlightNumberOne());
+            if (reservation.getFlightNumberTwo() != 0)
+            {
+                Plane p2 = companyService.findById(reservation.getFlightNumberTwo());
+                model.addAttribute("flightTwo", p2);
+            }else{
+                Plane p2 = new Plane();
+                p2.setEconomyPrice(0);
+                p2.setBussinessPrice(0);
+                model.addAttribute("flightTwo", p2);
+            }
+            model.addAttribute("flightOne", p1);
+            model.addAttribute("isRoundTrip", isRoundTrip);
+            model.addAttribute("reservation", reservation);
         }
-        model.addAttribute("flightOne", p1);
-        model.addAttribute("isRoundTrip", isRoundTrip);
-        model.addAttribute("reservation", reservation);
-
+        if (editing)
+        {
+            editing = false;
+            model.addAttribute("address", "/main-page/save-res");
+        }else {
+            model.addAttribute("address", "/main-page/passenger-info");
+        }
         return "seat-selection-show";
     }
+    @RequestMapping("/save-res")
+    public String saveRes(@ModelAttribute("Reservation") Reservation res)
+    {
 
+        editReservation.setFirstType(res.getFirstType());
+        editReservation.setSecondType(res.getSecondType());
+        Plane p = companyService.findById(editReservation.getFlightNumberOne());
+        Plane p1 = companyService.findById(editReservation.getFlightNumberTwo());
+        int firstPrice = 0;
+        int secondPrice = 0;
+        if (editReservation.getFirstType().equals("Economy"))
+        {
+            firstPrice = p.getEconomyPrice();
+        }else{
+            firstPrice = p.getBussinessPrice();
+        }
+        if (editReservation.getFlightNumberTwo() != 0)
+        {
+            if (editReservation.getSecondType().equals("Economy"))
+            {
+                secondPrice = p1.getEconomyPrice();
+            }else{
+                secondPrice = p1.getBussinessPrice();
+            }
+        }
+
+        int totalPas = flightInfo.getAdult() + flightInfo.getInfant() + flightInfo.getChild();
+
+        firstPrice = firstPrice*totalPas;
+
+        secondPrice = secondPrice*totalPas;
+
+        editReservation.setFirstPrice(firstPrice);
+
+        editReservation.setSecondPrice(secondPrice);
+
+        companyService.saveReservation(editReservation);
+
+        return "redirect:/main-page/find-reservation-info?pnrCode="+editReservation.getPnrCode();
+    }
     @PostMapping("/checkValid")
     public String checkvalid(@Valid @ModelAttribute("flightInfo") FlightInfo flight, BindingResult theBindingResult, Model model, RedirectAttributes redirectAttributes) {
-
+        if (flightInfo != null)
+        {
+            if (flight.getAdult() != flightInfo.getAdult() || flight.getChild() != flightInfo.getChild() || flight.getInfant() != flightInfo.getInfant())
+            {
+                newAdult = flight.getAdult();
+                newChild = flight.getChild();
+                newInfant = flight.getInfant();
+                if (newAdult == 0 && newChild == 0 && newInfant == 0)
+                {
+                    redirectAttributes.addFlashAttribute("error", "Please select at least one passenger");
+                    return "redirect:/main-page/home";
+                }
+                if (newAdult + newChild + newInfant < flightInfo.getAdult() + flightInfo.getChild() + flightInfo.getInfant())
+                {
+                    companyService.deleteUserPNR(companyService.getFlyersPNR(editReservation.getPnrCode()).get(0).getId());
+                }
+                changedPassengerCount = true;
+                System.out.println("Changed");
+            }
+        }
         flightInfo = flight;
 
         List<Plane> planes = companyService.findPlane(flightInfo.getDeparture(),flightInfo.getLanding(),flightInfo.getDepartureDate());
@@ -151,8 +304,7 @@ public class MainPageController {
                 return "redirect:/main-page/home";
             }
         }
-
-           return "redirect:/main-page/searchplane";
+       return "redirect:/main-page/searchplane";
     }
     @RequestMapping("/help")
     public String help()
@@ -202,6 +354,8 @@ public class MainPageController {
         model.addAttribute("users", users);
         model.addAttribute("planeOne", p1);
         model.addAttribute("planeTwo", p2);
+        int totalPrice = (reservation.getFirstPrice() + reservation.getSecondPrice())*users.size();
+        model.addAttribute("totalPrice", totalPrice);
         return "payment";
     }
     public String generatePNR()
@@ -217,7 +371,12 @@ public class MainPageController {
 
     @PostMapping("/processarrival")
     public String processArrival(@RequestParam("planeId") int planeId, Model model) {
-        reservation.setFlightNumberTwo(planeId);
+        if (editing)
+        {
+            editReservation.setFlightNumberTwo(planeId);
+        }else{
+            reservation.setFlightNumberTwo(planeId);
+        }
         return "redirect:/main-page/checkPlaneValidity";
     }
 
@@ -314,7 +473,6 @@ public class MainPageController {
     {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
-        // Get the username of the logged-in user
         String username = authentication.getName();
 
         for (UserPNR user: users)
@@ -364,6 +522,10 @@ public class MainPageController {
         model.addAttribute("planeTwo", p2);
 
         model.addAttribute("users", users);
+
+        int totalPrice = (reservation.getFirstPrice()+ reservation.getSecondPrice())*users.size();
+
+        model.addAttribute("totalPrice", totalPrice);
 
         return "payment";
     }
@@ -526,11 +688,35 @@ public class MainPageController {
     @RequestMapping("/edit-passenger-info")
     public String editPassenger(@RequestParam("pnrCode") String pnr, Model model)
     {
-        List<UserPNR> passengers = companyService.getFlyersPNR(pnr);
 
+        List<UserPNR> passengers = companyService.getFlyersPNR(pnr);
+        List<UserPNR> dataSend = new ArrayList<>();
+        if (changedPassengerCount)
+        {
+            changedPassengerCount = false;
+            int passenger = flightInfo.getAdult() + flightInfo.getChild() + flightInfo.getInfant();
+            for (int i = 0; i < passenger; i++) {
+                if (i < passengers.size())
+                {
+                    dataSend.add(passengers.get(i));
+                }else {
+                    UserPNR user = new UserPNR();
+                    user.setName("");
+                    user.setSurname("");
+                    user.setBirthDate(null);
+                    user.setPassportNo("");
+                    user.setNationalityNo("");
+                    user.setTelNo("");
+                    user.setEmail("");
+                    dataSend.add(user);
+                }
+            }
+        }else{
+            dataSend = passengers;
+        }
         ObjectMapper objectMapper = new ObjectMapper();
         try {
-            String passengerDataJson = objectMapper.writeValueAsString(passengers);
+            String passengerDataJson = objectMapper.writeValueAsString(dataSend);
             model.addAttribute("pnrCode", pnr);
             model.addAttribute("passengerData", passengerDataJson);
         } catch (JsonProcessingException e) {
@@ -541,10 +727,46 @@ public class MainPageController {
 
     @RequestMapping("/update-passengers")
     public String updatePassengers(@RequestBody List<UserPNR> passengers) {
-        for (UserPNR passenger : passengers) {
-            companyService.savePNR(passenger);
+        if (newAdult != 0 ||newChild != 0 || newInfant != 0)
+        {
+            for (UserPNR passenger : passengers) {
+                if (newAdult != 0)
+                {
+                    passenger.setPersonType("Adult");
+                } else if (newChild != 0) {
+                    passenger.setPersonType("Child");
+                }else {
+                    passenger.setPersonType("Infant");
+                }
+                passenger.setPnr(passengers.get(0).getPnr());
+                System.out.println(passenger);
+                companyService.savePNR(passenger);
+                System.out.println("Adult: " + newAdult);
+                System.out.println("Child: " + newChild);
+                System.out.println("Infant: " + newInfant);
+
+                if (passenger.getPersonType().equals("Adult"))
+                {
+                    newAdult--;
+                } else if (passenger.getPersonType().equals("Child")) {
+                    newChild--;
+                } else {
+                    newInfant--;
+                }
+            }
+            newAdult = 0;
+            newChild = 0;
+            newInfant = 0;
+        }else {
+            for (UserPNR passenger : passengers) {
+                passenger.setPnr(passengers.get(0).getPnr());
+                companyService.savePNR(passenger);
+            }
         }
+
         return "redirect:/main-page/find-reservation-info?pnrCode=" + passengers.get(0).getPnr();
     }
+
+
 
 }

@@ -236,14 +236,22 @@
             <input type="hidden" name="address" th:value="${address}">
             <input type="submit" value="Cancel Reservation">
         </form>
-        <form th:action="@{/main-page/edit-passenger-info}" th:object="${reservation}" method="get">
-            <input type="hidden" th:field="*{pnrCode}">
-            <input type="submit" value="Edit Passengers">
-        </form>
+        <div th:if="${reservation.status} != 'TICKETED'">
+            <form th:action="@{/main-page/edit-passenger-info}" th:object="${reservation}" method="get">
+                <input type="hidden" name="pnrCode" th:value="*{pnrCode}">
+                <input type="submit" value="Edit Passengers">
+            </form>
+        </div>
         <form th:action="@{/main-page/reset-everything}">
             <input type="hidden" name="address" th:value="${address}">
             <input type="submit" value="Go to Home Page">
         </form>
+        <div th:if="${reservation.status} != 'TICKETED'">
+            <form th:action="@{/main-page/edit-reservation}" th:object="${reservation}" method="get">
+                <input type="hidden" name="pnrCode" th:value="*{pnrCode}">
+                <input type="submit" value="Edit Reservation">
+            </form>
+        </div>
         <div th:if="${reservation.status} != 'TICKETED'">
             <form th:action="@{/main-page/make-payment}" th:object="${reservation}" method="get">
                 <input type="hidden" name="pnrCode" th:value="*{pnrCode}">
