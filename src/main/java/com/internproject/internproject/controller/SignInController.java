@@ -14,6 +14,8 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Controller
 public class SignInController {
@@ -34,14 +36,15 @@ public class SignInController {
     }
 
     @PostMapping("/creatingAccount")
-    public String createAccount(@Valid @ModelAttribute("webUser") WebUser theUser, BindingResult bindingResult) {
+    public String createAccount(@Valid @ModelAttribute("webUser") WebUser theUser, RedirectAttributes redirectAttributes, @RequestParam("password") String password,  @RequestParam("confirmPassword") String confirmPassword, BindingResult bindingResult) {
         if (companyService.findUserByUsername(theUser.getUsername()) != null) {
             bindingResult.rejectValue("username", "error.webUser", "An account already exists for this username.");
         }
-        if (bindingResult.hasErrors()) {
-            return "create-account";
+        if (!password.equals(confirmPassword))
+        {
+            redirectAttributes.addFlashAttribute("error", "Passwords do not match.");
+            return "redirect:/create-account";
         }
-
         User u = new User();
         u.setUsername(theUser.getUsername());
         u.setPassword(passwordEncoder.encode(theUser.getPassword()));

@@ -107,6 +107,7 @@
         <div id="passengerContainer">
             <!-- Passenger forms will be pre-filled here -->
         </div>
+        <input type="hidden" name="pnrCode" id="pnrCode" th:value="${pnrCode}">
         <input type="submit" value="Save Changes">
     </form>
 </div>
@@ -118,7 +119,8 @@
         const csrfToken = document.querySelector('meta[name="_csrf"]').getAttribute('content');
         const csrfHeader = document.querySelector('meta[name="_csrf_header"]').getAttribute('content');
 
-        const passengers = JSON.parse(document.getElementById('passengerData').textContent); // Assuming passenger data is passed as JSON
+        const passengers = JSON.parse(document.getElementById('passengerData').textContent);
+        const pnr = document.getElementById('pnrCode').value;
 
         passengers.forEach((passenger, index) => {
             addPassengerForm(passenger, index + 1);
@@ -243,7 +245,7 @@
                         if (!response.ok) {
                             throw new Error('Network response was not ok');
                         }
-                        window.location.href = "/main-page/reset-everything";
+                        window.location.href = "/main-page/reset-everything?address=/main-page/find-reservation-info?pnrCode=" + pnr;
                         return response.json();
                     })
                     .then(data => {

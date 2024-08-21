@@ -3,6 +3,7 @@ package com.internproject.internproject.dao;
 
 import com.internproject.internproject.entity.Reservation;
 import jakarta.persistence.EntityManager;
+import jakarta.persistence.TypedQuery;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -43,5 +44,12 @@ public class ReservationDAOImpl implements ReservationDAO{
     @Override
     public void changeRes(String id) {
         em.createQuery("update Reservation set status='TICKETED' where id=:id").setParameter("id", id).executeUpdate();
+    }
+
+    @Override
+    public List<Reservation> findByCreator(String creator) {
+        TypedQuery<Reservation> query = em.createQuery("FROM Reservation where creator=:creator", Reservation.class);
+        query.setParameter("creator", creator);
+        return query.getResultList();
     }
 }

@@ -229,7 +229,6 @@ public class MainPageController {
         redirectAttributes.addFlashAttribute("error", "Please select a valid plane time");
         if (flightInfo.getDepartureDate().getTime() == flightInfo.getArrivalDate().getTime())
         {
-            System.out.println(p1.getTimeDeparture().compareTo(p2.getTimeDeparture()));
             if (p1.getTimeDeparture().compareTo(p2.getTimeDeparture()) < 0)
             {
                 return "redirect:/main-page/seatSelection";
@@ -389,19 +388,52 @@ public class MainPageController {
         return "redirect:/main-page/user-management";
     }
 
+    @RequestMapping("/delete-profile")
+    public String deleteProfile(){
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = authentication.getName();
+        companyService.deleteUser(username);
+        List<Reservation> reservations = companyService.getPNRs(username);
+        for (Reservation reservation : reservations)
+        {
+            companyService.deleteReservation(reservation.getPnrCode());
+            List<UserPNR> users = companyService.getFlyersPNR(reservation.getPnrCode());
+            for (UserPNR userPNR: users)
+            {
+                companyService.deleteUserPNR(userPNR.getId());
+            }
+        }
+        return "redirect:/showLoginPage?logout";
+    }
     @RequestMapping("/delete-user")
     public String delete(@RequestParam("delUsername") String username, RedirectAttributes redirectAttributes)
     {
         User user = companyService.findUserByUsername(username);
-        if (user == null)
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username1 = authentication.getName();
+        if (username1.equals(username)) {
+            redirectAttributes.addFlashAttribute("error1", "You cannot delete yourself");
+        }else if (user == null)
         {
             redirectAttributes.addFlashAttribute("error1", "User not found");
         }else{
             companyService.deleteUser(username);
             redirectAttributes.addFlashAttribute("error1", "User deleted successfully");
         }
+        List<Reservation> pnrs = companyService.getPNRs(username);
+        for (Reservation pnr: pnrs)
+        {
+            companyService.deleteReservation(pnr.getPnrCode());
+            List<UserPNR> users = companyService.getFlyersPNR(pnr.getPnrCode());
+            for (UserPNR userPNR: users)
+            {
+                companyService.deleteUserPNR(userPNR.getId());
+            }
+        }
         return "redirect:/main-page/user-management";
     }
+
+
     @RequestMapping("/user-management")
     public String userManagement(Model model)
     {
@@ -410,9 +442,9 @@ public class MainPageController {
     @RequestMapping("/reservation-confirmed")
     public String reservationConfirmed(@RequestParam("pnrCode") String pnr, Model model)
     {
+        companyService.changeReservationStatus(pnr);
         Reservation reservation1 = companyService.findReservation(pnr);
         List<UserPNR> users = companyService.getFlyersPNR(pnr);
-        companyService.changeReservationStatus(pnr);
         Plane p1 = companyService.findById(reservation1.getFlightNumberOne());
         companyService.reduceSeat(p1, users.size(), reservation1.getFirstType());
         if (reservation1.getFlightNumberTwo() != 0) {
@@ -423,6 +455,7 @@ public class MainPageController {
         model.addAttribute("users", users);
         model.addAttribute("planeOne", companyService.findById(reservation1.getFlightNumberOne()));
         model.addAttribute("planeTwo", companyService.findById(reservation1.getFlightNumberTwo()));
+        model.addAttribute("address", "/main-page/home");
         return "show-reservation";
     }
     @RequestMapping("/find-reservation")
@@ -431,6 +464,12 @@ public class MainPageController {
             model.addAttribute("error", model.getAttribute("error"));
         }
         model.addAttribute("reservation", new Reservation());
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = authentication.getName();
+        if (companyService.getPNRs(username) != null)
+        {
+            model.addAttribute("pnrCodes", companyService.getPNRs(username));
+        }
         return "find-reservation";
     }
 
@@ -442,8 +481,6 @@ public class MainPageController {
         }
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String username = authentication.getName();
-        System.out.println(username);
-        System.out.println(companyService.findReservation(pnr).getCreator());
         if (!companyService.findReservation(pnr).getCreator().equals(username))
         {
             redirectAttributes.addFlashAttribute("error", "Reservation is not yours!");
@@ -455,10 +492,11 @@ public class MainPageController {
         model.addAttribute("users", users);
         model.addAttribute("planeOne", companyService.findById(reservation.getFlightNumberOne()));
         model.addAttribute("planeTwo", companyService.findById(reservation.getFlightNumberTwo()));
+        model.addAttribute("address", "/main-page/find-reservation");
         return "show-reservation";
     }
     @RequestMapping("/cancel-reservation")
-    public String cancelReservation(@RequestParam("pnrCode") String pnr, RedirectAttributes redirectAttributes) {
+    public String cancelReservation(@RequestParam("pnrCode") String pnr, @RequestParam("address") String address, RedirectAttributes redirectAttributes) {
         Reservation reservation = companyService.findReservation(pnr);
         List<UserPNR> users = companyService.getFlyersPNR(pnr);
         Plane p1 = companyService.findById(reservation.getFlightNumberOne());
@@ -473,16 +511,16 @@ public class MainPageController {
             companyService.deleteUserPNR(user.getId());
         }
         companyService.deleteReservation(pnr);
-        return "redirect:/main-page/reset-everything";
+        return "redirect:/main-page/reset-everything?address=" + address;
     }
 
     @RequestMapping("/reset-everything")
-    public String resetEverything()
+    public String resetEverything(@RequestParam("address") String address)
     {
         reservation = null;
         flightInfo = null;
         users = null;
-        return "redirect:/main-page/home";
+        return "redirect:" + address;
     }
 
     @RequestMapping("/edit-passenger-info")
@@ -493,6 +531,7 @@ public class MainPageController {
         ObjectMapper objectMapper = new ObjectMapper();
         try {
             String passengerDataJson = objectMapper.writeValueAsString(passengers);
+            model.addAttribute("pnrCode", pnr);
             model.addAttribute("passengerData", passengerDataJson);
         } catch (JsonProcessingException e) {
             e.printStackTrace();

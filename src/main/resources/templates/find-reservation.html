@@ -159,6 +159,48 @@
         .logout-form input[type="submit"]:hover {
             background-color: #c0392b;
         }
+        ul {
+            list-style: none;
+            padding: 0;
+            margin: 20px 0;
+        }
+
+        ul li {
+            background-color: #ffffff;
+            border: 1px solid #ccc;
+            padding: 15px 20px;
+            margin-bottom: 10px;
+            border-radius: 8px;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        ul li:hover {
+            transform: scale(1.03);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+        }
+
+        ul li span {
+            font-weight: bold;
+            font-size: 16px;
+            color: #34495e;
+        }
+
+        ul li.ticketed::before {
+            content: '\2713'; /* Checkmark icon */
+            margin-right: 10px;
+            font-size: 18px;
+            color: #2ecc71;
+        }
+
+        ul li.not-ticketed::before {
+            content: '\2717'; /* Cross icon */
+            margin-right: 10px;
+            font-size: 18px;
+            color: #e74c3c;
+        }
 
     </style>
 </head>
@@ -191,8 +233,29 @@
         <div class="info-text">
             <p>Enter the PNR code provided in your booking confirmation.</p>
         </div>
+
+        <div th:if="${pnrCodes != null && !pnrCodes.isEmpty()}">
+            <h2>Own Reservation PNRs</h2>
+            <ul id="pnrList">
+                <li th:each="pnr : ${pnrCodes}" th:classappend="${pnr.status} == 'TICKETED' ? 'ticketed' : 'not-ticketed'">
+                    <span th:text="${pnr.pnrCode}" ></span>
+                </li>
+            </ul>
+        </div>
     </div>
 </div>
 
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const pnrListItems = document.querySelectorAll('#pnrList li');
+        const pnrInput = document.getElementById('pnrCode');
+
+        pnrListItems.forEach(item => {
+            item.addEventListener('click', function() {
+                pnrInput.value = this.textContent.trim(); // Set the clicked PNR code in the input box
+            });
+        });
+    });
+</script>
 </body>
 </html>

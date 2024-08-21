@@ -123,7 +123,9 @@
 <div class="container">
     <h2>PNR Code for the reservation</h2>
     <h2 th:text="${reservation.pnrCode}"></h2>
-
+    <div th:if="${reservation.status} != 'TICKETED'">
+        <p>Reservation not paid. Pay from help section!</p>
+    </div>
     <div class="info-section">
         <h2>Passenger Information</h2>
         <div th:each="user : ${users}" class="card">
@@ -231,6 +233,7 @@
     <div class="btn-container">
         <form th:action="@{/main-page/cancel-reservation}" th:object="${reservation}" method="post">
             <input type="hidden" th:field="*{pnrCode}">
+            <input type="hidden" name="address" th:value="${address}">
             <input type="submit" value="Cancel Reservation">
         </form>
         <form th:action="@{/main-page/edit-passenger-info}" th:object="${reservation}" method="get">
@@ -238,9 +241,15 @@
             <input type="submit" value="Edit Passengers">
         </form>
         <form th:action="@{/main-page/reset-everything}">
+            <input type="hidden" name="address" th:value="${address}">
             <input type="submit" value="Go to Home Page">
         </form>
-
+        <div th:if="${reservation.status} != 'TICKETED'">
+            <form th:action="@{/main-page/make-payment}" th:object="${reservation}" method="get">
+                <input type="hidden" name="pnrCode" th:value="*{pnrCode}">
+                <input type="submit" value="Payment">
+            </form>
+        </div>
     </div>
 </div>
 

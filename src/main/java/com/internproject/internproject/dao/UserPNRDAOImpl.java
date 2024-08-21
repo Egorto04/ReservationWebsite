@@ -33,6 +33,7 @@ public class UserPNRDAOImpl implements UserPNRDAO{
         return List.of();
     }
 
+
     @Override
     public void delete(int id) {
         em.createQuery("delete from UserPNR where id=:id").setParameter("id", id).executeUpdate();
@@ -44,4 +45,6 @@ public class UserPNRDAOImpl implements UserPNRDAO{
         users.setParameter("pnr", pnr);
         return users.getResultList();
     }
+
+
 }

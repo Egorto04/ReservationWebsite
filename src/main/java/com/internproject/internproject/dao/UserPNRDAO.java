@@ -15,4 +15,5 @@ public interface UserPNRDAO {
     public void delete(int id);
 
     public List<UserPNR> findByPNR(String pnr);
+
 }
