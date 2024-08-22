@@ -330,8 +330,8 @@
 <body>
 <div class="sidebar">
     <h2>Menu</h2>
-    <a href="/section1" th:href="@{/section1}">Search Plane</a>
-    <a href="/section2" th:href="@{/section2}">Reservations</a>
+    <a href="/section1" th:href="@{/section1}">Reservation</a>
+    <a href="/section2" th:href="@{/section2}">Pnr Search</a>
     <a href="/section3" th:href="@{/section3}">User Management</a>
     <a href="/section4" th:href="@{/section4}">Help</a>
     <div class="profile-box">
@@ -353,21 +353,21 @@
             <div th:if="${error}" class="error-message" th:text="${error}"></div>
             <div class="radio-group">
                 <input type="radio" id="one_way" name="choice" th:field="*{direction}" value="One-Way" required>
-                <label for="one_way">One-Way</label>
+                <label for="one_way">ONE WAY</label>
 
                 <input type="radio" id="roundtrip" name="choice" th:field="*{direction}" value="Roundtrip" required>
-                <label for="roundtrip">Roundtrip</label>
+                <label for="roundtrip">ROUND TRIP</label>
             </div>
 
             <div class="form-group">
-                <label for="departure">Departure</label>
+                <label for="departure">Departure Port</label>
                 <select id="departure" th:field="*{departure}">
                     <option th:each="cont: ${countries}" th:value="${cont}" th:text="${cont}"></option>
                 </select>
             </div>
 
             <div class="form-group">
-                <label for="landing">Landing</label>
+                <label for="landing">Arrival Port</label>
                 <select id="landing" th:field="*{landing}">
                     <option th:each="cont: ${countries}" th:value="${cont}" th:text="${cont}"></option>
                 </select>
@@ -384,21 +384,21 @@
             </div>
 
             <div class="form-group">
-                <label for="adult">Adult Number</label>
+                <label for="adult">Adult Count</label>
                 <select id="adult" th:field="*{adult}" required>
                     <option th:each="num: ${numbers}" th:value="${num}" th:text="${num}"></option>
                 </select>
             </div>
 
             <div class="form-group">
-                <label for="child">Child Number</label>
+                <label for="child">Child Count</label>
                 <select id="child" th:field="*{child}">
                     <option th:each="num: ${numbers}" th:value="${num}" th:text="${num}"></option>
                 </select>
             </div>
 
             <div class="form-group">
-                <label for="infant">Infant Number</label>
+                <label for="infant">Infant Count</label>
                 <select id="infant" th:field="*{infant}">
                     <option th:each="num: ${numbers}" th:value="${num}" th:text="${num}"></option>
                 </select>

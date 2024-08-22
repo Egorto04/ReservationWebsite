@@ -328,7 +328,7 @@ public class MainPageController {
         String username = authentication.getName();
         if (companyService.findReservation(pnr) != null)
         {
-            if (companyService.findReservation(pnr).getStatus() != null) {
+            if (companyService.findReservation(pnr).getStatus().equals("TICKETED")) {
                 redirectAttributes.addFlashAttribute("error", "Reservation already ticketed");
                 return "redirect:/main-page/payment-search";
             }
@@ -497,6 +497,7 @@ public class MainPageController {
         }
         reservation.setCreator(username);
         companyService.saveReservation(reservation);
+        companyService.changeReservationStatus(reservation.getPnrCode(), "NOT TICKETED");
         return "redirect:/main-page/payment";
     }
 
@@ -604,7 +605,7 @@ public class MainPageController {
     @RequestMapping("/reservation-confirmed")
     public String reservationConfirmed(@RequestParam("pnrCode") String pnr, Model model)
     {
-        companyService.changeReservationStatus(pnr);
+        companyService.changeReservationStatus(pnr, "TICKETED");
         Reservation reservation1 = companyService.findReservation(pnr);
         List<UserPNR> users = companyService.getFlyersPNR(pnr);
         Plane p1 = companyService.findById(reservation1.getFlightNumberOne());
@@ -637,8 +638,13 @@ public class MainPageController {
 
     @RequestMapping("/find-reservation-info")
     public String findPNRReservation(@RequestParam("pnrCode") String pnr, RedirectAttributes redirectAttributes, Model model) {
-        if (companyService.findReservation(pnr) == null) {
+        if (companyService.findReservation(pnr) == null ) {
             redirectAttributes.addFlashAttribute("error", "No reservation found");
+            return "redirect:/main-page/find-reservation";
+        }
+        if (companyService.findReservation(pnr).getStatus().equals("CANCELLED"))
+        {
+            redirectAttributes.addFlashAttribute("error", "This reservation is cancelled");
             return "redirect:/main-page/find-reservation";
         }
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -668,11 +674,7 @@ public class MainPageController {
             Plane p2 = companyService.findById(reservation.getFlightNumberTwo());
             companyService.increaseSeat(p2, users.size(), reservation.getSecondType());
         }
-        for (UserPNR user: users)
-        {
-            companyService.deleteUserPNR(user.getId());
-        }
-        companyService.deleteReservation(pnr);
+        companyService.changeReservationStatus(pnr, "CANCELLED");
         return "redirect:/main-page/reset-everything?address=" + address;
     }
 

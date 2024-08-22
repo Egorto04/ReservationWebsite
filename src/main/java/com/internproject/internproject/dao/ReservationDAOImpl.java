@@ -42,8 +42,11 @@ public class ReservationDAOImpl implements ReservationDAO{
     }
 
     @Override
-    public void changeRes(String id) {
-        em.createQuery("update Reservation set status='TICKETED' where id=:id").setParameter("id", id).executeUpdate();
+    public void changeRes(String id, String stat) {
+        em.createQuery("UPDATE Reservation r SET r.status = :status WHERE r.id = :id")
+                .setParameter("status", stat)
+                .setParameter("id", id)
+                .executeUpdate();
     }
 
     @Override
