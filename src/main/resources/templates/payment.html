@@ -195,6 +195,13 @@
     </style>
     <script>
         function showModal() {
+            var cashOption = document.getElementById("cash");
+            var cardOption = document.getElementById("credit-card");
+
+            if (!cashOption.checked && !cardOption.checked) {
+                alert("Please select a payment method (Cash or Credit Card) before proceeding.");
+                return;
+            }
             var modal = document.getElementById("confirmationModal");
             modal.style.display = "flex";
         }
@@ -289,7 +296,9 @@
     </table>
 
     <div class="total-price">
-        Total Price: <span th:text="${reservation.firstPrice + (reservation.flightNumberTwo != 0 ? reservation.secondPrice : 0)} + '$'"></span>
+        One Person Price: <span th:text="${reservation.firstPrice + (reservation.flightNumberTwo != 0 ? reservation.secondPrice : 0)} + '$'"></span>
+        <br><br>
+        Total Price: <span th:text="${totalPrice} + '$'"></span>
     </div>
 
     <h2>Payment Information</h2>
@@ -309,7 +318,7 @@
             <h3>Are you sure?</h3>
             <p>There is no refund beyond this point</p>
             <p>This action cannot be undone.</p>
-            Total Price: <span th:text="${reservation.firstPrice + (reservation.flightNumberTwo != 0 ? reservation.secondPrice : 0)} + '$'"></span>
+            Total Price: <span th:text="${totalPrice} + '$'"></span>
             <br><br>
             <button class="modal-button confirm" onclick="confirmDeleteProfile()">Yes, Pay</button>
             <button class="modal-button cancel" onclick="closeModal()">No</button>

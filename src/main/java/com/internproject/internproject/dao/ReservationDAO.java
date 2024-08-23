@@ -16,7 +16,7 @@ public interface ReservationDAO {
 
     public void delete(String id);
 
-    public void changeRes(String id);
+    public void changeRes(String id, String status);
 
     public List<Reservation> findByCreator(String creator);
 }

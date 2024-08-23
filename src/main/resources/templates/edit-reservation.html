@@ -80,6 +80,7 @@
             margin-bottom: 30px;
         }
 
+
         label {
             display: block;
             margin-bottom: 8px;
@@ -276,21 +277,7 @@
                 }
             }
         }
-        function filterOptions(searchInputId, selectId) {
-            var input = document.getElementById(searchInputId);
-            var filter = input.value.toUpperCase();
-            var select = document.getElementById(selectId);
-            var options = select.getElementsByTagName('option');
 
-            for (var i = 0; i < options.length; i++) {
-                var txtValue = options[i].textContent || options[i].innerText;
-                if (txtValue.toUpperCase().indexOf(filter) > -1) {
-                    options[i].style.display = "";
-                } else {
-                    options[i].style.display = "none";
-                }
-            }
-        }
         function disappearArrivalDate() {
             if (document.getElementById("one_way").checked) {
                 document.getElementById("arrivalDateDiv").style.display = "none";
@@ -303,7 +290,7 @@
 
         window.onload = function () {
             setMinDepartureDate();
-
+            disappearArrivalDate();
             var departureDateInput = document.getElementById("departureDate");
             if (departureDateInput.value) {
                 updateArrivalDateMin();
@@ -344,8 +331,8 @@
 <body>
 <div class="sidebar">
     <h2>Menu</h2>
-    <a href="/section1" th:href="@{/section1}">Reservation</a>
-    <a href="/section2" th:href="@{/section2}">Pnr Search</a>
+    <a href="/section1" th:href="@{/section1}">Search Plane</a>
+    <a href="/section2" th:href="@{/section2}">Reservations</a>
     <a href="/section3" th:href="@{/section3}">User Management</a>
     <a href="/section4" th:href="@{/section4}">Help</a>
     <div class="profile-box">
@@ -361,27 +348,36 @@
 
 <div class="main-content" id="main-content">
     <div class="container">
-        <h1>Search Plane</h1>
-
+        <h1>Change Reservation</h1>
+        <h1>PNR Code</h1>
+        <h1 th:text="${reservation.pnrCode}"></h1>
         <form action="#" th:action="@{/main-page/checkValid}" th:object="${flight}" method="post">
             <div th:if="${error}" class="error-message" th:text="${error}"></div>
             <div class="radio-group">
-                <input type="radio" id="one_way" name="choice" th:field="*{direction}" value="One-Way" required>
-                <label for="one_way">ONE WAY</label>
+                <input type="radio" id="one_way" name="choice"
+                       th:field="*{direction}"
+                       value="One-Way"
+                       th:checked="${flight.direction == 'One-Way'}"
+                       required>
+                <label for="one_way">One-Way</label>
 
-                <input type="radio" id="roundtrip" name="choice" th:field="*{direction}" value="Roundtrip" required>
-                <label for="roundtrip">ROUND TRIP</label>
+                <input type="radio" id="roundtrip" name="choice"
+                       th:field="*{direction}"
+                       value="Roundtrip"
+                       th:checked="${flight.direction == 'Roundtrip'}"
+                       required>
+                <label for="roundtrip">Roundtrip</label>
             </div>
 
             <div class="form-group">
-                <label for="departure">Departure Port</label>
+                <label for="departure">Departure</label>
                 <select id="departure" th:field="*{departure}">
                     <option th:each="cont: ${countries}" th:value="${cont}" th:text="${cont}"></option>
                 </select>
             </div>
 
             <div class="form-group">
-                <label for="landing">Arrival Port</label>
+                <label for="landing">Landing</label>
                 <select id="landing" th:field="*{landing}">
                     <option th:each="cont: ${countries}" th:value="${cont}" th:text="${cont}"></option>
                 </select>
@@ -398,23 +394,27 @@
             </div>
 
             <div class="form-group">
-                <label for="adult">Adult Count</label>
+                <label for="adult">Adult Number</label>
                 <select id="adult" th:field="*{adult}" required>
-                    <option th:each="num: ${numbers}" th:value="${num}" th:text="${num}"></option>
+                    <option th:each="num: ${numbers}" th:value="${num}" th:text="${num}"
+                            th:selected="${num} != *{adult}"></option>
                 </select>
             </div>
 
             <div class="form-group">
-                <label for="child">Child Count</label>
+                <label for="child">Child Number</label>
                 <select id="child" th:field="*{child}">
-                    <option th:each="num: ${numbers}" th:value="${num}" th:text="${num}"></option>
+                    <option th:each="num: ${numbers}"
+                            th:value="${num}"
+                            th:text="${num}"></option>
                 </select>
             </div>
 
             <div class="form-group">
-                <label for="infant">Infant Count</label>
+                <label for="infant">Infant Number</label>
                 <select id="infant" th:field="*{infant}">
-                    <option th:each="num: ${numbers}" th:value="${num}" th:text="${num}"></option>
+                    <option th:each="num: ${numbers}" th:value="${num}"  th:text="${num}"
+                            th:selected="${num} != *{infant}"></option>
                 </select>
             </div>
 

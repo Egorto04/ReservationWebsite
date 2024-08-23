@@ -136,9 +136,9 @@ public class CompanyService implements UserDetailsService {
     }
 
     @Transactional
-    public void changeReservationStatus(String id)
+    public void changeReservationStatus(String id, String status)
     {
-        reservationDAO.changeRes(id);
+        reservationDAO.changeRes(id, status);
     }
 
 //    @PostConstruct
@@ -193,7 +193,16 @@ public class CompanyService implements UserDetailsService {
 //    }
     public List<Reservation> getPNRs(String creator)
     {
-        return reservationDAO.findByCreator(creator);
+        List<Reservation> reservations = reservationDAO.findByCreator(creator);
+        List<Reservation> sendReservations = new ArrayList<>();
+        for (Reservation r: reservations)
+        {
+            if (!r.getStatus().equals("CANCELLED"))
+            {
+                sendReservations.add(r);
+            }
+        }
+        return sendReservations;
     }
 
     @Override

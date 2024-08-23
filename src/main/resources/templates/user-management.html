@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.w3.org/1999/xhtml">
 <head>
     <meta charset="UTF-8">
     <title>User Management</title>
@@ -248,6 +248,19 @@
         .modal-button.cancel:hover {
             background-color: #95a5a6;
         }
+        .profile-box {
+            background-color: #34495e;
+            padding: 10px;
+            border-radius: 6px;
+            text-align: center;
+            font-size: 14px;
+            margin-top: 20px;
+            color: #ecf0f1;
+        }
+
+        .profile-box span {
+            font-weight: bold;
+        }
     </style>
     <script>
         function togglePasswordVisibility() {
@@ -314,10 +327,14 @@
 <body>
 <div class="sidebar">
     <h2>Menu</h2>
-    <a th:href="@{/section1}">Search Plane</a>
-    <a th:href="@{/section2}">Reservations</a>
-    <a th:href="@{/section3}">User Management</a>
-    <a th:href="@{/section4}">Help</a>
+    <a href="/section1" th:href="@{/section1}">Reservation</a>
+    <a href="/section2" th:href="@{/section2}">Pnr Search</a>
+    <a href="/section3" th:href="@{/section3}">User Management</a>
+    <a href="/section4" th:href="@{/section4}">Help</a>
+
+    <div class="profile-box">
+        Logged in as: <span sec:authentication="principal.username"></span>
+    </div>
     <div class="logout-form">
         <form action="#" th:action="@{/logout}" method="post">
             <input type="submit" value="Logout">
@@ -352,7 +369,7 @@
             <div id="passwordMessage" style="color: red; display:none;">
                 <p>Password must be at least 8 characters long and contain at least one uppercase letter and one number.</p>
             </div>
-            <input type="submit" value="Submit">
+            <input type="submit" value="ADD USER">
         </form>
     </div>
 
@@ -364,14 +381,14 @@
         <form th:action="@{/main-page/delete-user}" method="post">
             <label for="delUsername">Username:</label>
             <input type="text" id="delUsername" name="delUsername" required>
-            <input type="submit" value="Delete">
+            <input type="submit" value="DELETE USER">
         </form>
     </div>
 
     <div class="container">
         <h2 class="header">Delete Own Profile</h2>
         <form id="deleteProfileForm" th:action="@{/main-page/delete-profile}" method="post">
-            <input type="button" value="Delete Profile" onclick="showModal()">
+            <input type="button" value="DELETE PROFILE" onclick="showModal()">
         </form>
     </div>
 </div>

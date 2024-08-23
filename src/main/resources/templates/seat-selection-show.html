@@ -183,7 +183,7 @@
     <input type="hidden" id="secondbusseat" th:value="${flightTwo.businessSeat}">
     <input type="hidden" id="firstecoseat" th:value="${flightOne.economySeat}">
     <input type="hidden" id="secondecoseat" th:value="${flightTwo.economySeat}">
-    <form th:action="@{/main-page/passenger-info}" th:object="${reservation}" method="post">
+    <form th:action="@{${address}}" th:object="${reservation}" method="post">
         <table>
             <caption>Flight Prices</caption>
             <thead>
@@ -238,7 +238,7 @@
             </tr>
             </tbody>
         </table>
-        <input type="submit" class="submit-button" th:value="Save">
+        <input type="submit" class="submit-button" th:value="CONTINUE">
     </form>
 </div>
 </body>

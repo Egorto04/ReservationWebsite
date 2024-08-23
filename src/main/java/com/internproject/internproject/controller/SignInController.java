@@ -38,7 +38,8 @@ public class SignInController {
     @PostMapping("/creatingAccount")
     public String createAccount(@Valid @ModelAttribute("webUser") WebUser theUser, RedirectAttributes redirectAttributes, @RequestParam("password") String password,  @RequestParam("confirmPassword") String confirmPassword, BindingResult bindingResult) {
         if (companyService.findUserByUsername(theUser.getUsername()) != null) {
-            bindingResult.rejectValue("username", "error.webUser", "An account already exists for this username.");
+            redirectAttributes.addFlashAttribute("error", "An account already exists for this username.");
+            return "redirect:/create-account";
         }
         if (!password.equals(confirmPassword))
         {
