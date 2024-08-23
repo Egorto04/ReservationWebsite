@@ -56,5 +56,9 @@ public class SignInController {
         companyService.saveUser(u);
         return "redirect:/showLoginPage";
     }
+    public String generateRandomValue()
+    {
+
+    }
 
 }

@@ -12,8 +12,8 @@ public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
-    private int id;
+    @Column(name = "memberNo")
+    private String memberNo;
 
     @Column(name = "username")
     private String username;
@@ -34,6 +34,10 @@ public class User {
     @Column (name = "email")
     private String email;
 
+    @Column (name = "membership")
+    private String membership;
+
+
     @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @JoinTable(name = "users_roles", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "role_id"))
     private Collection<Role> roles;
@@ -51,12 +55,20 @@ public class User {
         this.enabled = true;
     }
 
-    public int getId() {
-        return id;
+    public String getMemberNo() {
+        return memberNo;
     }
 
-    public void setId(int id) {
-        this.id = id;
+    public void setMemberNo(String memberNo) {
+        this.memberNo = memberNo;
+    }
+
+    public String getMembership() {
+        return membership;
+    }
+
+    public void setMembership(String membership) {
+        this.membership = membership;
     }
 
     public String getFirstName() {
@@ -118,12 +130,15 @@ public class User {
     @Override
     public String toString() {
         return "User{" +
-                "id=" + id +
-                ", firstName='" + firstName + '\'' +
-                ", lastName='" + lastName + '\'' +
+                "memberNo='" + memberNo + '\'' +
                 ", username='" + username + '\'' +
                 ", password='" + password + '\'' +
+                ", enabled=" + enabled +
+                ", firstName='" + firstName + '\'' +
+                ", lastName='" + lastName + '\'' +
                 ", email='" + email + '\'' +
+                ", membership='" + membership + '\'' +
+                ", roles=" + roles +
                 '}';
     }
 }
