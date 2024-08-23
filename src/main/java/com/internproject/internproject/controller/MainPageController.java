@@ -124,7 +124,6 @@ public class MainPageController {
         }else{
             flightInfo.setDirection("One-Way");
         }
-        System.out.println(flightInfo.getDirection());
         model.addAttribute("countries", countries);
         model.addAttribute("numbers", numbers);
         model.addAttribute("reservation", reservation);
@@ -175,7 +174,6 @@ public class MainPageController {
             if (editReservation.getFlightNumberTwo() != 0)
             {
                 p2 = companyService.findById(editReservation.getFlightNumberTwo());
-                System.out.println(p2);
             }else{
                 p2 = new Plane();
                 p2.setEconomyPrice(0);
@@ -186,8 +184,6 @@ public class MainPageController {
             model.addAttribute("isRoundTrip", isRoundTrip);
             model.addAttribute("reservation", editReservation);
             model.addAttribute("address", "/main-page/save-res");
-            System.out.println(editing);
-            System.out.println(changedPassengerCount);
             if (changedPassengerCount)
             {
                 model.addAttribute("address",   "/main-page/edit-passenger-info?pnrCode=" +editReservation.getPnrCode());
@@ -277,7 +273,6 @@ public class MainPageController {
                     companyService.deleteUserPNR(companyService.getFlyersPNR(editReservation.getPnrCode()).get(0).getId());
                 }
                 changedPassengerCount = true;
-                System.out.println("Changed");
             }
         }
         flightInfo = flight;
@@ -383,8 +378,16 @@ public class MainPageController {
     @RequestMapping ("/checkPlaneValidity")
     public String checkPlaneValidity(RedirectAttributes redirectAttributes)
     {
-        Plane p1 = companyService.findById(reservation.getFlightNumberOne());
-        Plane p2 = companyService.findById(reservation.getFlightNumberTwo());
+        Plane p1;
+        Plane p2;
+        if (editing)
+        {
+            p1 = companyService.findById(editReservation.getFlightNumberOne());
+            p2 = companyService.findById(editReservation.getFlightNumberTwo());
+        }else{
+            p1 = companyService.findById(reservation.getFlightNumberOne());
+            p2 = companyService.findById(reservation.getFlightNumberTwo());
+        }
         redirectAttributes.addFlashAttribute("error", "Please select a valid plane time");
         if (flightInfo.getDepartureDate().getTime() == flightInfo.getArrivalDate().getTime())
         {
@@ -741,11 +744,7 @@ public class MainPageController {
                     passenger.setPersonType("Infant");
                 }
                 passenger.setPnr(passengers.get(0).getPnr());
-                System.out.println(passenger);
                 companyService.savePNR(passenger);
-                System.out.println("Adult: " + newAdult);
-                System.out.println("Child: " + newChild);
-                System.out.println("Infant: " + newInfant);
 
                 if (passenger.getPersonType().equals("Adult"))
                 {
