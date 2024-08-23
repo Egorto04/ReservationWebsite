@@ -78,6 +78,7 @@ public class CompanyService implements UserDetailsService {
     {
         return reservationDAO.findById(reservationId);
     }
+
     public List<Plane> findPlane(String departure, String landing, Date departureDate)
     {
         List<Plane> planes = planeDAO.getPlaneByDepartureLanding(departure,landing,departureDate);
@@ -259,5 +260,15 @@ public class CompanyService implements UserDetailsService {
 
     public User findUserByUsername(String username) {
         return userDAO.findByUsername(username);
+    }
+
+    @Transactional
+    public void decreasePoints(String memberNo, int points) {
+        User u = userDAO.getByMemberNo(memberNo);
+        if (u != null)
+        {
+            u.setPoints(u.getPoints()-points);
+            userDAO.save(u);
+        }
     }
 }

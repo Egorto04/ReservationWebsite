@@ -321,7 +321,8 @@ public class MainPageController {
                 return "redirect:/main-page/home";
             }
         }
-       return "redirect:/main-page/searchplane";
+
+        return "redirect:/main-page/searchplane";
     }
     @RequestMapping("/help")
     public String help(Model model)
@@ -364,9 +365,57 @@ public class MainPageController {
             return "redirect:/main-page/payment-search";
         }
     }
+    @RequestMapping("/reservation-confirmed")
+    public String reservationConfirmed(@RequestParam("paymentType") String payment, @RequestParam("pnrCode") String pnr, Model model, RedirectAttributes redirectAttributes)
+    {
+        Reservation reservation1 = companyService.findReservation(pnr);
+        System.out.println("1. " +reservation1.getStatus());
+        List<UserPNR> users = companyService.getFlyersPNR(pnr);
+        User u = companyService.findUserByUsername(reservation1.getCreator());
+        String memberNo = u.getMemberNo();
+        int pointsSpend = (users.size()*(reservation1.getFirstPrice() + reservation1.getSecondPrice()))/2;
+        int pointsGained = (users.size()*(reservation1.getFirstPrice() + reservation1.getSecondPrice()))/10;
+        if (payment.equals("Points"))
+        {
+            System.out.println("Points");
+            if (u.getPoints() <  pointsSpend)
+            {
+                redirectAttributes.addFlashAttribute("error", "Not enough points");
+                return "redirect:/main-page/make-payment?pnrCode="+pnr;
+            }else{
+                companyService.decreasePoints(memberNo, pointsSpend);
+                companyService.changeReservationStatus(pnr, "TICKETED");
+            }
+        }else{
+            companyService.increasePoints(memberNo, pointsGained);
+            companyService.changeReservationStatus(pnr, "TICKETED");
+        }
 
+        Plane p1 = companyService.findById(reservation1.getFlightNumberOne());
+
+        companyService.reduceSeat(p1, users.size(), reservation1.getFirstType());
+
+        if (reservation1.getFlightNumberTwo() != 0) {
+
+            Plane p2 = companyService.findById(reservation1.getFlightNumberTwo());
+
+            companyService.reduceSeat(p2, users.size(), reservation1.getSecondType());
+
+        }
+
+        companyService.checkMembership(memberNo);
+
+        reservation1.setStatus("TICKETED");
+
+        model.addAttribute("reservation", reservation1);
+        model.addAttribute("users", users);
+        model.addAttribute("planeOne", companyService.findById(reservation1.getFlightNumberOne()));
+        model.addAttribute("planeTwo", companyService.findById(reservation1.getFlightNumberTwo()));
+        model.addAttribute("address", "/main-page/home");
+        return "show-reservation";
+    }
     @RequestMapping("/make-payment")
-    public String makePayment(@RequestParam("pnrCode") String pnr, Model model) {
+    public String makePayment(@RequestParam("pnrCode") String pnr, @ModelAttribute("error") String error, Model model) {
         Reservation reservation = companyService.findReservation(pnr);
         List<UserPNR> users = companyService.getFlyersPNR(pnr);
         Plane p1 = companyService.findById(reservation.getFlightNumberOne());
@@ -375,6 +424,7 @@ public class MainPageController {
         model.addAttribute("users", users);
         model.addAttribute("planeOne", p1);
         model.addAttribute("planeTwo", p2);
+        model.addAttribute("error",error);
         int totalPrice = (reservation.getFirstPrice() + reservation.getSecondPrice())*users.size();
         model.addAttribute("totalPrice", totalPrice);
         return "payment";
@@ -455,12 +505,6 @@ public class MainPageController {
             companyService.deleteUserPNR(userPNR.getId());
         });
 
-        int totalPas = flightInfo.getAdult() + flightInfo.getInfant() + flightInfo.getChild();
-
-        firstPrice = firstPrice*totalPas;
-
-        secondPrice = secondPrice*totalPas;
-
         reservation.setFirstPrice(firstPrice);
 
         reservation.setSecondPrice(secondPrice);
@@ -483,6 +527,7 @@ public class MainPageController {
         for (int i = 0; i < flightInfo.getInfant(); i++) {
             users.add(new UserPNR());
         }
+
         model.addAttribute("adult", flightInfo.getAdult());
         model.addAttribute("child", flightInfo.getChild());
         model.addAttribute("infant", flightInfo.getInfant());
@@ -659,30 +704,7 @@ public class MainPageController {
         model.addAttribute("user", u);
         return "user-management";
     }
-    @RequestMapping("/reservation-confirmed")
-    public String reservationConfirmed(@RequestParam("pnrCode") String pnr, Model model)
-    {
-        companyService.changeReservationStatus(pnr, "TICKETED");
-        Reservation reservation1 = companyService.findReservation(pnr);
-        List<UserPNR> users = companyService.getFlyersPNR(pnr);
-        Plane p1 = companyService.findById(reservation1.getFlightNumberOne());
-        companyService.reduceSeat(p1, users.size(), reservation1.getFirstType());
-        if (reservation1.getFlightNumberTwo() != 0) {
-            Plane p2 = companyService.findById(reservation1.getFlightNumberTwo());
-            companyService.reduceSeat(p2, users.size(), reservation1.getSecondType());
-        }
-        User u = companyService.findUserByUsername(reservation1.getCreator());
-        String memberNo = u.getMemberNo();
-        int points = (users.size()*(reservation1.getFirstPrice() + reservation1.getSecondPrice()))/10;
-        companyService.increasePoints(memberNo, points);
-        companyService.checkMembership(memberNo);
-        model.addAttribute("reservation", reservation1);
-        model.addAttribute("users", users);
-        model.addAttribute("planeOne", companyService.findById(reservation1.getFlightNumberOne()));
-        model.addAttribute("planeTwo", companyService.findById(reservation1.getFlightNumberTwo()));
-        model.addAttribute("address", "/main-page/home");
-        return "show-reservation";
-    }
+
     @RequestMapping("/find-reservation")
     public String findReservation(Model model) {
         if (model.containsAttribute("error")) {

@@ -197,11 +197,24 @@
         function showModal() {
             var cashOption = document.getElementById("cash");
             var cardOption = document.getElementById("credit-card");
+            var pointOption = document.getElementById("point");
 
-            if (!cashOption.checked && !cardOption.checked) {
-                alert("Please select a payment method (Cash or Credit Card) before proceeding.");
+            var totalPriceElement = document.getElementById("totalPrice");
+            var pointPriceElement = document.getElementById("pointPrice");
+            var modalPriceElement = document.getElementById("modalPrice");
+            var methodLabelElement = document.getElementById("methodLabel");
+
+            if (cashOption.checked || cardOption.checked) {
+                modalPriceElement.textContent = totalPriceElement.textContent;
+                methodLabelElement.textContent = "Total Price:";
+            } else if (pointOption.checked) {
+                modalPriceElement.textContent = pointPriceElement.textContent.replace('$', '');
+                methodLabelElement.textContent = "Total Points:";
+            } else {
+                alert("Please select a payment method before proceeding.");
                 return;
             }
+
             var modal = document.getElementById("confirmationModal");
             modal.style.display = "flex";
         }
@@ -296,20 +309,29 @@
     </table>
 
     <div class="total-price">
-        One Person Price: <span th:text="${reservation.firstPrice + (reservation.flightNumberTwo != 0 ? reservation.secondPrice : 0)} + '$'"></span>
+        One Person Price: <span id="onePrice" th:text="${reservation.firstPrice + (reservation.flightNumberTwo != 0 ? reservation.secondPrice : 0)} + '$'"></span>
         <br><br>
-        Total Price: <span th:text="${totalPrice} + '$'"></span>
+        Total Price: <span id="totalPrice" th:text="${totalPrice} + '$'"></span>
+        <br><br>
+        Point Price: <span id="pointPrice" th:text="${totalPrice / 2}"></span>
     </div>
 
     <h2>Payment Information</h2>
-    <div class="payment-options">
-        <input type="radio" id="cash" name="paymentType" value="Cash" required>
-        <label for="cash">Cash</label>
-
-        <input type="radio" id="credit-card" name="paymentType" value="Credit Card" required>
-        <label for="credit-card">Credit Card</label>
+    <div th:if="${error}">
+        <p style="color: red;" th:text="${error}"></p>
     </div>
+    <p>Please select a payment method to proceed with the payment.</p>
     <form id="payReservation" th:action="@{/main-page/reservation-confirmed}" method="post">
+        <div class="payment-options">
+            <input type="radio" id="cash" name="paymentType" value="Cash" required>
+            <label for="cash">Cash</label>
+
+            <input type="radio" id="credit-card" name="paymentType" value="Credit Card" required>
+            <label for="credit-card">Credit Card</label>
+
+            <input type="radio" id="point" name="paymentType" value="Points" required>
+            <label for="point">Points</label>
+        </div>
         <input type="hidden" id="pnrCode" name="pnrCode" th:value="${reservation.pnrCode}">
         <input type="button" value="Pay" onclick="showModal()">
     </form>
@@ -318,7 +340,7 @@
             <h3>Are you sure?</h3>
             <p>There is no refund beyond this point</p>
             <p>This action cannot be undone.</p>
-            Total Price: <span th:text="${totalPrice} + '$'"></span>
+            <span id="methodLabel">Total Price:</span> <span id="modalPrice" th:text="${totalPrice} + '$'"></span>
             <br><br>
             <button class="modal-button confirm" onclick="confirmDeleteProfile()">Yes, Pay</button>
             <button class="modal-button cancel" onclick="closeModal()">No</button>
