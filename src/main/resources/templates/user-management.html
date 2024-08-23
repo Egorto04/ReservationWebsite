@@ -334,6 +334,12 @@
 
     <div class="profile-box">
         Logged in as: <span sec:authentication="principal.username"></span>
+        <br>
+        Member No: <span th:text="${user.memberNo}"></span>
+        <br>
+        Membership: <span th:text="${user.membership}"></span>
+        <br>
+        Points: <span th:text="${user.points}"></span>
     </div>
     <div class="logout-form">
         <form action="#" th:action="@{/logout}" method="post">
@@ -361,8 +367,19 @@
             <p th:text="${error}"></p>
         </div>
         <form th:action="@{/main-page/add-user}" method="post">
+
+            <label for="firstName">First Name:</label>
+            <input type="text" id="firstName" name="firstName" required>
+
+            <label for="lastName">Last Name:</label>
+            <input type="text" id="lastName" name="lastName" required>
+
+            <label for="email">Email:</label>
+            <input type="text" id="email" name="email" required>
+
             <label for="username">Username:</label>
             <input type="text" id="username" name="username" required>
+
 
             <div class="password-container">
                 <label for="password">Password:</label>

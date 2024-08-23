@@ -34,6 +34,10 @@ import java.util.List;
 public class MainPageController {
 
     private static final String ALPHANUMERIC_STRING = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+
+    private static final String CHARACTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+    private static final int LENGTH = 8;
+    private static final SecureRandom RANDOM = new SecureRandom();
     CompanyService companyService;
 
     @Autowired
@@ -86,6 +90,10 @@ public class MainPageController {
         {
             model.addAttribute("error", error);
         }
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = authentication.getName();
+        User u = companyService.findUserByUsername(username);
+        model.addAttribute("user", u);
         return "main-page";
     }
     @RequestMapping("/edit-reservation")
@@ -316,8 +324,12 @@ public class MainPageController {
        return "redirect:/main-page/searchplane";
     }
     @RequestMapping("/help")
-    public String help()
+    public String help(Model model)
     {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = authentication.getName();
+        User u = companyService.findUserByUsername(username);
+        model.addAttribute("user", u);
         return "help";
     }
     @RequestMapping("/payment-search")
@@ -548,7 +560,7 @@ public class MainPageController {
         return "payment";
     }
     @RequestMapping("/add-user")
-    public String addUser(@RequestParam("username") String username, @RequestParam("password") String password, @RequestParam("confirmPassword") String confirmPassword,  RedirectAttributes redirectAttributes,Model model)
+    public String addUser(@RequestParam("username") String username,@RequestParam("firstName") String firstName ,@RequestParam("lastName") String lastName,@RequestParam("email") String email, @RequestParam("password") String password, @RequestParam("confirmPassword") String confirmPassword,  RedirectAttributes redirectAttributes,Model model)
     {
         PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
         if (!password.equals(confirmPassword))
@@ -559,7 +571,18 @@ public class MainPageController {
             redirectAttributes.addFlashAttribute("error", "Username already exists");
         }else{
             User user = new User();
+            String randomMember;
+            do {
+                randomMember = generateRandomValue();
+            }while(companyService.getByMemberNo(randomMember) != null);
+            user.setMemberNo(randomMember);
+            user.setMembership("Regular");
+            user.setPoints(0);
             user.setUsername(username);
+            user.setLastName(lastName);
+            user.setFirstName(firstName);
+            user.setEmail(email);
+            user.setEnabled(true);
             password = passwordEncoder.encode(password);
             user.setPassword(password);
             companyService.saveUser(user);
@@ -567,7 +590,14 @@ public class MainPageController {
         }
         return "redirect:/main-page/user-management";
     }
-
+    public String generateRandomValue() {
+        StringBuilder randomValue = new StringBuilder(LENGTH);
+        for (int i = 0; i < LENGTH; i++) {
+            int randomIndex = RANDOM.nextInt(CHARACTERS.length());
+            randomValue.append(CHARACTERS.charAt(randomIndex));
+        }
+        return randomValue.toString();
+    }
     @RequestMapping("/delete-profile")
     public String deleteProfile(){
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -577,6 +607,12 @@ public class MainPageController {
         for (Reservation reservation : reservations)
         {
             companyService.deleteReservation(reservation.getPnrCode());
+            Plane p1 = companyService.findById(reservation.getFlightNumberOne());
+            companyService.increaseSeat(p1, companyService.getFlyersPNR(reservation.getPnrCode()).size(), reservation.getFirstType());
+            if (reservation.getFlightNumberTwo() != 0) {
+                Plane p2 = companyService.findById(reservation.getFlightNumberTwo());
+                companyService.increaseSeat(p2, companyService.getFlyersPNR(reservation.getPnrCode()).size(), reservation.getSecondType());
+            }
             List<UserPNR> users = companyService.getFlyersPNR(reservation.getPnrCode());
             for (UserPNR userPNR: users)
             {
@@ -617,6 +653,10 @@ public class MainPageController {
     @RequestMapping("/user-management")
     public String userManagement(Model model)
     {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = authentication.getName();
+        User u = companyService.findUserByUsername(username);
+        model.addAttribute("user", u);
         return "user-management";
     }
     @RequestMapping("/reservation-confirmed")
@@ -635,6 +675,7 @@ public class MainPageController {
         String memberNo = u.getMemberNo();
         int points = (users.size()*(reservation1.getFirstPrice() + reservation1.getSecondPrice()))/10;
         companyService.increasePoints(memberNo, points);
+        companyService.checkMembership(memberNo);
         model.addAttribute("reservation", reservation1);
         model.addAttribute("users", users);
         model.addAttribute("planeOne", companyService.findById(reservation1.getFlightNumberOne()));
@@ -654,6 +695,8 @@ public class MainPageController {
         {
             model.addAttribute("pnrCodes", companyService.getPNRs(username));
         }
+        User u = companyService.findUserByUsername(username);
+        model.addAttribute("user", u);
         return "find-reservation";
     }
 

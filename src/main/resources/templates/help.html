@@ -153,6 +153,12 @@
     <a href="/section4" th:href="@{/section4}">Help</a>
     <div class="profile-box">
         Logged in as: <span sec:authentication="principal.username"></span>
+        <br>
+        Member No: <span th:text="${user.memberNo}"></span>
+        <br>
+        Membership: <span th:text="${user.membership}"></span>
+        <br>
+        Points: <span th:text="${user.points}"></span>
     </div>
     <div class="logout-form">
         <form action="#" th:action="@{/logout}" method="post">

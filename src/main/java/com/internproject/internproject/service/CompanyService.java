@@ -150,6 +150,23 @@ public class CompanyService implements UserDetailsService {
         }
     }
     @Transactional
+    public void checkMembership(String memberNo)
+    {
+        User u = userDAO.getByMemberNo(memberNo);
+        if (u != null)
+        {
+            if (u.getPoints() >= 1000 && u.getPoints() < 2000)
+            {
+                u.setMembership("Regular+");
+                userDAO.save(u);
+            } else if (u.getPoints() >= 2000) {
+                u.setMembership("Gold");
+                userDAO.save(u);
+            }
+        }
+    }
+
+    @Transactional
     public void changeReservationStatus(String id, String status)
     {
         reservationDAO.changeRes(id, status);
