@@ -12,8 +12,8 @@ public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "memberNo")
-    private String memberNo;
+    @Column(name = "id")
+    private int id;
 
     @Column(name = "username")
     private String username;
@@ -37,6 +37,12 @@ public class User {
     @Column (name = "membership")
     private String membership;
 
+    @Column(name = "member_no")
+    private String memberNo;
+
+    @Column(name = "points")
+    private int points;
+
 
     @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @JoinTable(name = "users_roles", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "role_id"))
@@ -46,13 +52,12 @@ public class User {
     public User() {
     }
 
-    public User(String firstName, String lastName, String username, String password, String email) {
-        this.firstName = firstName;
-        this.lastName = lastName;
-        this.username = username;
-        this.password = password;
-        this.email = email;
-        this.enabled = true;
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
     }
 
     public String getMemberNo() {
@@ -127,18 +132,24 @@ public class User {
         this.roles = roles;
     }
 
-    @Override
-    public String toString() {
-        return "User{" +
-                "memberNo='" + memberNo + '\'' +
-                ", username='" + username + '\'' +
-                ", password='" + password + '\'' +
-                ", enabled=" + enabled +
-                ", firstName='" + firstName + '\'' +
-                ", lastName='" + lastName + '\'' +
-                ", email='" + email + '\'' +
-                ", membership='" + membership + '\'' +
-                ", roles=" + roles +
-                '}';
+    public int getPoints() {
+        return points;
+    }
+
+    public void setPoints(int points) {
+        this.points = points;
+    }
+
+    public User(String memberNo, String username, String password, boolean enabled, String firstName, String lastName, String email, String membership, int points, Collection<Role> roles) {
+        this.memberNo = memberNo;
+        this.username = username;
+        this.password = password;
+        this.enabled = enabled;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.email = email;
+        this.membership = membership;
+        this.points = points;
+        this.roles = roles;
     }
 }

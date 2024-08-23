@@ -344,6 +344,18 @@
 
 <div class="main-content">
     <div class="container">
+        <h2 class="header">Search User</h2>
+        <div th:if="${error2 != null}" class="error-message">
+            <p th:text="${error2}"></p>
+        </div>
+        <form th:action="@{/main-page/find-user}" method="get">
+            <label for="findUser">Member NO:</label>
+            <input type="text" id="findUser" name="memberNo" required>
+            <input type="submit" value="SEARCH USER">
+        </form>
+    </div>
+
+    <div class="container">
         <h2 class="header">User Management</h2>
         <div th:if="${error != null}" class="error-message">
             <p th:text="${error}"></p>

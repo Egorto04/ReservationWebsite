@@ -3,6 +3,7 @@ package com.internproject.internproject.dao;
 
 import com.internproject.internproject.entity.User;
 import jakarta.persistence.EntityManager;
+import jakarta.persistence.NoResultException;
 import jakarta.persistence.TypedQuery;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -66,6 +67,17 @@ public class UserDAOImpl implements UserDAO{
     @Override
     public void deleteByUsername(String username) {
         em.createQuery("delete from User where username = :username").setParameter("username", username).executeUpdate();
+    }
+
+    @Override
+    public User getByMemberNo(String memberNo) {
+        try {
+            return em.createQuery("from User where memberNo = :memberNo", User.class)
+                    .setParameter("memberNo", memberNo)
+                    .getSingleResult();
+        } catch (NoResultException e) {
+            return null; // or Optional.empty();
+        }
     }
 
 }

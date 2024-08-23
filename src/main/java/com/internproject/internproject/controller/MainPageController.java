@@ -131,6 +131,20 @@ public class MainPageController {
         return "edit-reservation";
     }
 
+    @RequestMapping("/find-user")
+    public String getUser(@RequestParam("memberNo") String memberNo, Model model, RedirectAttributes redirectAttributes)
+    {
+        User user = companyService.getByMemberNo(memberNo);
+        if (user == null)
+        {
+            redirectAttributes.addFlashAttribute("error2", "No user found with that Member No");
+            return "redirect:/main-page/user-management";
+        }
+        model.addAttribute("user", user);
+        return "show-user";
+    }
+
+
     @RequestMapping("/searchplane")
     public String searchPlane( Model model,  @ModelAttribute("error") String error) {
         List<Plane> planes = companyService.findPlane(flightInfo.getDeparture(),flightInfo.getLanding(),flightInfo.getDepartureDate());
@@ -617,6 +631,10 @@ public class MainPageController {
             Plane p2 = companyService.findById(reservation1.getFlightNumberTwo());
             companyService.reduceSeat(p2, users.size(), reservation1.getSecondType());
         }
+        User u = companyService.findUserByUsername(reservation1.getCreator());
+        String memberNo = u.getMemberNo();
+        int points = (users.size()*(reservation1.getFirstPrice() + reservation1.getSecondPrice()))/10;
+        companyService.increasePoints(memberNo, points);
         model.addAttribute("reservation", reservation1);
         model.addAttribute("users", users);
         model.addAttribute("planeOne", companyService.findById(reservation1.getFlightNumberOne()));

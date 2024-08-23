@@ -18,4 +18,7 @@ public interface UserDAO {
     public User findByUsername(String username);
 
     void deleteByUsername(String username);
+
+    User getByMemberNo(String memberNo);
+
 }

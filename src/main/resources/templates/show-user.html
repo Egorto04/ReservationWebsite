@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Show User</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        .container {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            width: 300px;
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 20px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        td {
+            padding: 10px;
+            border-bottom: 1px solid #ddd;
+            color: #555;
+        }
+        td:first-child {
+            font-weight: bold;
+            color: #333;
+        }
+        td:last-child {
+            text-align: right;
+        }
+        .label {
+            text-align: left;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            margin-top: 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            width: 100%;
+            font-size: 16px;
+            text-align: center;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+<body>
+<div class="container" th:object="${user}">
+    <h1>User Information</h1>
+    <table>
+        <tr>
+            <td class="label">ID:</td>
+            <td th:text="*{id}">ID</td>
+        </tr>
+        <tr>
+            <td class="label">Username:</td>
+            <td th:text="*{username}">Username</td>
+        </tr>
+        <tr>
+            <td class="label">First Name:</td>
+            <td th:text="*{firstName}">First Name</td>
+        </tr>
+        <tr>
+            <td class="label">Last Name:</td>
+            <td th:text="*{lastName}">Last Name</td>
+        </tr>
+        <tr>
+            <td class="label">Member No:</td>
+            <td th:text="*{memberNo}">Member No</td>
+        </tr>
+        <tr>
+            <td class="label">Membership:</td>
+            <td th:text="*{membership}">Membership</td>
+        </tr>
+        <tr>
+            <td class="label">Points:</td>
+            <td th:text="*{points}">Points</td>
+        </tr>
+    </table>
+    <form th:action="@{/main-page/user-management}" method="get">
+        <button type="submit">Back</button>
+    </form>
+</div>
+</body>
+</html>

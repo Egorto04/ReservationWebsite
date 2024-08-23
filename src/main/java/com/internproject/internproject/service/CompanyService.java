@@ -134,7 +134,21 @@ public class CompanyService implements UserDetailsService {
         p.setAvailabeSeats(p.getAvailabeSeats()+seatAmount);
         planeDAO.save(p);
     }
+    public User getByMemberNo(String memberNo)
+    {
+        return userDAO.getByMemberNo(memberNo);
+    }
 
+    @Transactional
+    public void increasePoints(String memberNo, int points)
+    {
+        User u = userDAO.getByMemberNo(memberNo);
+        if (u != null)
+        {
+            u.setPoints(u.getPoints()+points);
+            userDAO.save(u);
+        }
+    }
     @Transactional
     public void changeReservationStatus(String id, String status)
     {
