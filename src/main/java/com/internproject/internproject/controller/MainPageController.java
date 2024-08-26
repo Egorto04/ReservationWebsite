@@ -99,16 +99,21 @@ public class MainPageController {
         model.addAttribute("user", u);
         return "main-page";
     }
+
+    @RequestMapping("/access-denied")
+    public String accessDenied() {
+        return "access-denied";
+    }
     @RequestMapping("/edit-reservation")
     public String editReservation(@RequestParam("pnrCode") String pnr, Model model) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String username = authentication.getName();
         if (!companyService.findReservation(pnr).getCreator().equals(username)) {
-            return "redirect:/main-page/home";
+            return "redirect:/main-page/access-denied";
         }
         if(companyService.findReservation(pnr).getStatus().equals("TICKETED"))
         {
-            return "redirect:/main-page/home";
+            return "redirect:/main-page/access-denied";
         }
         editing = true;
         Reservation reservation = companyService.findReservation(pnr);
@@ -806,11 +811,11 @@ public class MainPageController {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String username = authentication.getName();
         if (!companyService.findReservation(pnr).getCreator().equals(username)) {
-            return "redirect:/main-page/home";
+            return "redirect:/main-page/access-denied";
         }
         if(companyService.findReservation(pnr).getStatus().equals("TICKETED"))
         {
-            return "redirect:/main-page/home";
+            return "redirect:/main-page/access-denied";
         }
         List<UserPNR> passengers = companyService.getFlyersPNR(pnr);
         List<UserPNR> dataSend = new ArrayList<>();
