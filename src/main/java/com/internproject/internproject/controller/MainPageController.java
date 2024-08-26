@@ -9,6 +9,8 @@ import com.internproject.internproject.entity.User;
 import com.internproject.internproject.entity.UserPNR;
 import com.internproject.internproject.service.CompanyService;
 import com.internproject.internproject.user.FlightInfo;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -17,6 +19,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -98,6 +101,15 @@ public class MainPageController {
     }
     @RequestMapping("/edit-reservation")
     public String editReservation(@RequestParam("pnrCode") String pnr, Model model) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = authentication.getName();
+        if (!companyService.findReservation(pnr).getCreator().equals(username)) {
+            return "redirect:/main-page/home";
+        }
+        if(companyService.findReservation(pnr).getStatus().equals("TICKETED"))
+        {
+            return "redirect:/main-page/home";
+        }
         editing = true;
         Reservation reservation = companyService.findReservation(pnr);
         editReservation = reservation;
@@ -306,7 +318,11 @@ public class MainPageController {
             redirectAttributes.addFlashAttribute("countries", countries);
             redirectAttributes.addFlashAttribute("numbers", numbers);
             redirectAttributes.addFlashAttribute("flight", new FlightInfo());
-            redirectAttributes.addFlashAttribute("error", "No flight for going");
+            redirectAttributes.addFlashAttribute("error", "NO FLIGHTS FOR DEPARTURE");
+            if (editing)
+            {
+                return "redirect:/main-page/edit-reservation?pnrCode="+editReservation.getPnrCode();
+            }
             return "redirect:/main-page/home";
         }
         if (flightInfo.getDirection().equals("Roundtrip"))
@@ -317,7 +333,11 @@ public class MainPageController {
                 redirectAttributes.addFlashAttribute("countries", countries);
                 redirectAttributes.addFlashAttribute("numbers", numbers);
                 redirectAttributes.addFlashAttribute("flight", new FlightInfo());
-                redirectAttributes.addFlashAttribute("error", "No flight for return");
+                redirectAttributes.addFlashAttribute("error", "NO FLIGHTS FOR ARRIVAL");
+                if (editing)
+                {
+                    return "redirect:/main-page/edit-reservation?pnrCode="+editReservation.getPnrCode();
+                }
                 return "redirect:/main-page/home";
             }
         }
@@ -416,6 +436,10 @@ public class MainPageController {
     }
     @RequestMapping("/make-payment")
     public String makePayment(@RequestParam("pnrCode") String pnr, @ModelAttribute("error") String error, Model model) {
+        if(companyService.findReservation(pnr).getStatus().equals("TICKETED"))
+        {
+            return "redirect:/main-page/home";
+        }
         Reservation reservation = companyService.findReservation(pnr);
         List<UserPNR> users = companyService.getFlyersPNR(pnr);
         Plane p1 = companyService.findById(reservation.getFlightNumberOne());
@@ -644,27 +668,30 @@ public class MainPageController {
         return randomValue.toString();
     }
     @RequestMapping("/delete-profile")
-    public String deleteProfile(){
+    public String deleteProfile(HttpServletRequest request, HttpServletResponse response){
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String username = authentication.getName();
-        companyService.deleteUser(username);
-        List<Reservation> reservations = companyService.getPNRs(username);
-        for (Reservation reservation : reservations)
-        {
-            companyService.deleteReservation(reservation.getPnrCode());
-            Plane p1 = companyService.findById(reservation.getFlightNumberOne());
-            companyService.increaseSeat(p1, companyService.getFlyersPNR(reservation.getPnrCode()).size(), reservation.getFirstType());
-            if (reservation.getFlightNumberTwo() != 0) {
-                Plane p2 = companyService.findById(reservation.getFlightNumberTwo());
-                companyService.increaseSeat(p2, companyService.getFlyersPNR(reservation.getPnrCode()).size(), reservation.getSecondType());
-            }
-            List<UserPNR> users = companyService.getFlyersPNR(reservation.getPnrCode());
-            for (UserPNR userPNR: users)
+        if (authentication != null){
+            String username = authentication.getName();
+            companyService.deleteUser(username);
+            List<Reservation> reservations = companyService.getPNRs(username);
+            for (Reservation reservation : reservations)
             {
-                companyService.deleteUserPNR(userPNR.getId());
+                companyService.deleteReservation(reservation.getPnrCode());
+                Plane p1 = companyService.findById(reservation.getFlightNumberOne());
+                companyService.increaseSeat(p1, companyService.getFlyersPNR(reservation.getPnrCode()).size(), reservation.getFirstType());
+                if (reservation.getFlightNumberTwo() != 0) {
+                    Plane p2 = companyService.findById(reservation.getFlightNumberTwo());
+                    companyService.increaseSeat(p2, companyService.getFlyersPNR(reservation.getPnrCode()).size(), reservation.getSecondType());
+                }
+                List<UserPNR> users = companyService.getFlyersPNR(reservation.getPnrCode());
+                for (UserPNR userPNR: users)
+                {
+                    companyService.deleteUserPNR(userPNR.getId());
+                }
             }
+            new SecurityContextLogoutHandler().logout(request, response, authentication);
         }
-        return "redirect:/showLoginPage?logout";
+        return "redirect:/showLoginPage?logout"; // Redirect to login page after logout
     }
     @RequestMapping("/delete-user")
     public String delete(@RequestParam("delUsername") String username, RedirectAttributes redirectAttributes)
@@ -776,7 +803,15 @@ public class MainPageController {
     @RequestMapping("/edit-passenger-info")
     public String editPassenger(@RequestParam("pnrCode") String pnr, Model model)
     {
-
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = authentication.getName();
+        if (!companyService.findReservation(pnr).getCreator().equals(username)) {
+            return "redirect:/main-page/home";
+        }
+        if(companyService.findReservation(pnr).getStatus().equals("TICKETED"))
+        {
+            return "redirect:/main-page/home";
+        }
         List<UserPNR> passengers = companyService.getFlyersPNR(pnr);
         List<UserPNR> dataSend = new ArrayList<>();
         if (changedPassengerCount)
