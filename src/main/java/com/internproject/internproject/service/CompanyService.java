@@ -76,9 +76,12 @@ public class CompanyService implements UserDetailsService {
 
     public Reservation findReservation(String reservationId)
     {
-        return reservationDAO.findById(reservationId);
+        return reservationDAO.getReservation(reservationId);
     }
-
+    public List<Reservation> findReservations(String pnr)
+    {
+        return reservationDAO.getReservations(pnr);
+    }
     public List<Plane> findPlane(String departure, String landing, Date departureDate)
     {
         List<Plane> planes = planeDAO.getPlaneByDepartureLanding(departure,landing,departureDate);
@@ -160,8 +163,15 @@ public class CompanyService implements UserDetailsService {
             {
                 u.setMembership("Regular+");
                 userDAO.save(u);
-            } else if (u.getPoints() >= 2000) {
+            } else if (u.getPoints() >= 2000 && u.getPoints() < 10000) {
                 u.setMembership("Gold");
+                userDAO.save(u);
+            }else if (u.getPoints() >= 10000)
+            {
+                u.setMembership("Platinum");
+                userDAO.save(u);
+            }else {
+                u.setMembership("Regular");
                 userDAO.save(u);
             }
         }
@@ -177,7 +187,7 @@ public class CompanyService implements UserDetailsService {
 //    public void createPlanes(){
 //        Random rand = new Random();
 //        String[] locations = new String[]{"Ankara","Istanbul","Izmir","Antalya","Adana","Trabzon","Samsun","Erzurum","Van","Konya"};
-//        for (int i = 0; i < 100000; i++) {
+//        for (int i = 0; i < 50000; i++) {
 //            Plane p = new Plane();
 //            int randNum = rand.nextInt(locations.length);
 //            p.setDepartureLocation(locations[randNum]);

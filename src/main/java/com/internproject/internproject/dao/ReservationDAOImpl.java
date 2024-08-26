@@ -22,13 +22,26 @@ public class ReservationDAOImpl implements ReservationDAO{
     }
 
     @Override
-    public Reservation findById(String id) {
+    public Reservation findById(int id) {
         return em.find(Reservation.class, id);
     }
 
     @Override
-    public String getCreator(String id) {
-        return "";
+    public Reservation getReservation(String pnr) {
+        TypedQuery<Reservation> query = em.createQuery("FROM Reservation where pnrCode=:pnr", Reservation.class);
+        query.setParameter("pnr", pnr);
+        List<Reservation> res = query.getResultList();
+        if(res.size() > 0) {
+            return res.get(0);
+        }
+        return null;
+    }
+
+    @Override
+    public List<Reservation> getReservations(String pnr) {
+        TypedQuery<Reservation> query = em.createQuery("FROM Reservation where pnrCode=:pnr", Reservation.class);
+        query.setParameter("pnr", pnr);
+        return query.getResultList();
     }
 
     @Override
@@ -38,12 +51,12 @@ public class ReservationDAOImpl implements ReservationDAO{
 
     @Override
     public void delete(String id) {
-        em.createQuery("delete from Reservation where id=:id").setParameter("id", id).executeUpdate();
+        em.createQuery("delete from Reservation where pnrCode=:id").setParameter("id", id).executeUpdate();
     }
 
     @Override
     public void changeRes(String id, String stat) {
-        em.createQuery("UPDATE Reservation r SET r.status = :status WHERE r.id = :id")
+        em.createQuery("UPDATE Reservation r SET r.status = :status WHERE r.pnrCode = :id")
                 .setParameter("status", stat)
                 .setParameter("id", id)
                 .executeUpdate();

@@ -1,15 +1,16 @@
 package com.internproject.internproject.entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 
 @Entity
 @Table(name="reservations")
 public class Reservation {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
+    private int id;
+
     @Column(name = "pnr_code")
     private String pnrCode;
 
@@ -37,7 +38,8 @@ public class Reservation {
     @Column(name = "creator")
     private String creator;
 
-    public Reservation(int flightNumberOne, int flightNumberTwo, String firstType, String secondType, String status, int firstPrice, int secondPrice, String creator) {
+    public Reservation(String pnrCode, int flightNumberOne, int flightNumberTwo, String firstType, String secondType, String status, int firstPrice, int secondPrice, String creator) {
+        this.pnrCode = pnrCode;
         this.flightNumberOne = flightNumberOne;
         this.flightNumberTwo = flightNumberTwo;
         this.firstType = firstType;
@@ -53,6 +55,14 @@ public class Reservation {
 
     public String getPnrCode() {
         return pnrCode;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
     }
 
     public void setPnrCode(String pnrCode) {

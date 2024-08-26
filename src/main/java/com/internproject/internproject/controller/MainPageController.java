@@ -108,7 +108,17 @@ public class MainPageController {
     public String editReservation(@RequestParam("pnrCode") String pnr, Model model) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String username = authentication.getName();
-        if (!companyService.findReservation(pnr).getCreator().equals(username)) {
+        List<Reservation> reservations = companyService.findReservations(pnr);
+        boolean found = false;
+        for (Reservation res: reservations)
+        {
+            if (res.getCreator().equals(username))
+            {
+                found = true;
+                break;
+            }
+        }
+        if (!found) {
             return "redirect:/main-page/access-denied";
         }
         if(companyService.findReservation(pnr).getStatus().equals("TICKETED"))
@@ -393,10 +403,12 @@ public class MainPageController {
     @RequestMapping("/reservation-confirmed")
     public String reservationConfirmed(@RequestParam("paymentType") String payment, @RequestParam("pnrCode") String pnr, Model model, RedirectAttributes redirectAttributes)
     {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = authentication.getName();
         Reservation reservation1 = companyService.findReservation(pnr);
         System.out.println("1. " +reservation1.getStatus());
         List<UserPNR> users = companyService.getFlyersPNR(pnr);
-        User u = companyService.findUserByUsername(reservation1.getCreator());
+        User u = companyService.findUserByUsername(username);
         String memberNo = u.getMemberNo();
         int pointsSpend = (users.size()*(reservation1.getFirstPrice() + reservation1.getSecondPrice()))/2;
         int pointsGained = (users.size()*(reservation1.getFirstPrice() + reservation1.getSecondPrice()))/10;
@@ -737,6 +749,44 @@ public class MainPageController {
         return "user-management";
     }
 
+    @RequestMapping("/append-reservation")
+    public String appendReservation(@RequestParam("pnr") String pnr,@RequestParam("nationalityNo")  String nationalityNo ,Model model, RedirectAttributes redirectAttributes) {
+        List<UserPNR> users = companyService.getFlyersPNR(pnr);
+        boolean found = false;
+        for (UserPNR user : users) {
+            if (user.getNationalityNo().equals(nationalityNo)) {
+                found = true;
+                System.out.println("Found User.");
+                break;
+            }
+        }
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = authentication.getName();
+        if (found)
+        {
+            Reservation reservation = new Reservation();
+            Reservation r1 = companyService.findReservation(pnr);
+            reservation.setPnrCode(r1.getPnrCode());
+            reservation.setFirstPrice(r1.getFirstPrice());
+            reservation.setFirstType(r1.getFirstType());
+            reservation.setFlightNumberOne(r1.getFlightNumberOne());
+            if (r1.getFlightNumberTwo() != 0)
+            {
+                reservation.setFlightNumberTwo(r1.getFlightNumberTwo());
+                reservation.setSecondType(r1.getSecondType());
+            }else{
+                reservation.setFlightNumberTwo(0);
+            }
+            reservation.setStatus(r1.getStatus());
+            reservation.setCreator(username);
+            companyService.saveReservation(reservation);
+            System.out.println("Saved.");
+        }else{
+            redirectAttributes.addFlashAttribute("error1", "There is no user with nationality no under that reservation");
+        }
+        return "redirect:/main-page/find-reservation";
+    }
+
     @RequestMapping("/find-reservation")
     public String findReservation(Model model) {
         if (model.containsAttribute("error")) {
@@ -767,7 +817,16 @@ public class MainPageController {
         }
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String username = authentication.getName();
-        if (!companyService.findReservation(pnr).getCreator().equals(username))
+        List<Reservation> reserves = companyService.findReservations(pnr);
+        boolean found = false;
+        for (Reservation res: reserves)
+        {
+            if (res.getCreator().equals(username))
+            {
+                found = true;
+            }
+        }
+        if (!found)
         {
             redirectAttributes.addFlashAttribute("error", "Reservation is not yours!");
             return "redirect:/main-page/find-reservation";
@@ -810,7 +869,17 @@ public class MainPageController {
     {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String username = authentication.getName();
-        if (!companyService.findReservation(pnr).getCreator().equals(username)) {
+        List<Reservation> reservations = companyService.findReservations(pnr);
+        boolean found = false;
+        for (Reservation res: reservations)
+        {
+            if (res.getCreator().equals(username))
+            {
+                found = true;
+                break;
+            }
+        }
+        if (!found) {
             return "redirect:/main-page/access-denied";
         }
         if(companyService.findReservation(pnr).getStatus().equals("TICKETED"))

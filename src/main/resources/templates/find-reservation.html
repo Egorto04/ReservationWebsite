@@ -51,7 +51,7 @@
             padding: 40px;
             flex-grow: 1;
             display: flex;
-            justify-content: center;
+            flex-direction: column;
             align-items: center;
             background-color: #ecf0f1;
             transition: background-color 0.3s ease;
@@ -68,6 +68,7 @@
             opacity: 0;
             transform: translateY(20px);
             animation: fadeInUp 0.6s ease forwards;
+            margin-bottom: 20px; /* Added margin for spacing between forms */
         }
 
         .form-container h1 {
@@ -266,6 +267,21 @@
                     <span th:text="${pnr.pnrCode}" ></span>
                 </li>
             </ul>
+        </div>
+    </div>
+    <div class="form-container">
+        <h1>Find Your Reservation</h1>
+        <div th:if="${error1} != null" style="color: red; margin-bottom: 20px;" th:text="${error1}"></div>
+
+        <form th:action="@{/main-page/append-reservation}" method="post">
+            <label for="pnr">PNR Code:</label>
+            <input type="text" id="pnr" name="pnr" required placeholder="Enter your PNR code">
+            <label for="nationalityNo">Nationality No:</label>
+            <input type="text" id="nationalityNo" name="nationalityNo" required placeholder="Enter your Nationality No">
+            <input type="submit" value="Find Reservation">
+        </form>
+        <div class="info-text">
+            <p>Enter the PNR code provided in your booking confirmation.</p>
         </div>
     </div>
 </div>

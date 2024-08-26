@@ -8,9 +8,11 @@ public interface ReservationDAO {
 
     public void save(Reservation reservation);
 
-    public Reservation findById(String id);
+    public Reservation findById(int id);
 
-    public String getCreator(String id);
+    public Reservation getReservation(String pnr);
+
+    public List<Reservation> getReservations(String pnr);
 
     public List<Reservation> findAll();
 
