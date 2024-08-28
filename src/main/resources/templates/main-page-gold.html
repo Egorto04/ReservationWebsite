@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Search Plane</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+            color: #333;
+            display: flex;
+        }
+
+        .sidebar {
+            width: 250px;
+            background-color: #efba27;
+            color: #ecf0f1;
+            height: 100vh;
+            font-weight: bold;
+            position: fixed;
+            top: 0;
+            left: 0;
+            padding: 20px;
+            box-sizing: border-box;
+            transition: background-color 0.3s ease;
+        }
+
+        .sidebar h2 {
+            color: #ecf0f1;
+            font-weight: 600;
+            margin-bottom: 30px;
+        }
+
+        .sidebar a {
+            color: #ffffff;
+            display: block;
+            padding: 12px;
+            text-decoration: none;
+            margin-bottom: 15px;
+            border-radius: 6px;
+            transition: background-color 0.3s ease;
+            font-weight: bold;
+        }
+
+        .sidebar a:hover {
+            background-color: #cb9f1b;
+        }
+
+        .main-content {
+            flex-grow: 1;
+            margin-left: 250px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 40px;
+            box-sizing: border-box;
+            background-color: #ecf0f1;
+            transition: background-color 0.3s ease;
+        }
+
+        .container {
+            max-width: 600px;
+            width: 100%;
+            padding: 30px;
+            background-color: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            box-sizing: border-box;
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fadeInUp 0.6s ease forwards;
+        }
+
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+            font-size: 28px;
+            margin-bottom: 30px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #34495e;
+        }
+
+        input[type="text"],
+        input[type="date"],
+        select {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 20px;
+            border: 1px solid #bdc3c7;
+            border-radius: 6px;
+            box-sizing: border-box;
+            transition: border-color 0.3s ease;
+        }
+
+        input[type="text"]:focus,
+        input[type="date"]:focus,
+        select:focus {
+            border-color: #efba27;
+            outline: none;
+        }
+
+        .radio-group {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 25px;
+        }
+
+        .radio-group label {
+            background-color: #bdc3c7;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            padding: 10px 20px;
+            cursor: pointer;
+            transition: background-color 0.3s ease, color 0.3s ease;
+            text-align: center;
+            flex-grow: 1;
+            margin: 0 5px;
+            color: #2c3e50;
+        }
+
+        .radio-group input[type="radio"] {
+            display: none;
+        }
+
+        .radio-group input[type="radio"]:checked + label {
+            background-color: #efba27;
+            color: white;
+            border-color: #efba27;
+        }
+
+        .radio-group label:hover {
+            background-color: #95a5a6;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        input[type="submit"] {
+            width: 100%;
+            padding: 14px;
+            background-color: #efba27;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s ease, transform 0.3s ease;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+        select {
+            appearance: none; /* Remove default arrow */
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            background-color: #ffffff;
+            border: 1px solid #ccc;
+            padding: 10px 15px;
+            font-size: 14px;
+            border-radius: 8px;
+            width: 100%;
+            color: #333;
+            cursor: pointer;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+            background-image: url('data:image/svg+xml;base64,YOUR_BASE64_ARROW_IMAGE'); /* Custom arrow */
+            background-repeat: no-repeat;
+            background-position: right 10px center;
+            background-size: 12px;
+        }
+
+        select:focus {
+            outline: none;
+            border-color: #efba27;
+            box-shadow: 0 0 8px rgba(234, 220, 9, 0.5);
+        }
+
+        select:hover {
+            border-color: #cb9f1b;
+        }
+
+        .form-group:focus-within label {
+            color: #efba27;
+        }
+        input[type="submit"]:hover {
+            background-color: #cb9f1b;
+            transform: scale(1.02);
+        }
+
+        .logout-form {
+            margin-top: 30px;
+            text-align: center;
+        }
+
+        .logout-form input[type="submit"] {
+            width: auto;
+            padding: 10px 20px;
+            background-color: #e74c3c;
+        }
+
+        .logout-form input[type="submit"]:hover {
+            background-color: #c0392b;
+        }
+
+        .error-message {
+            color: #e74c3c;
+            font-size: 14px;
+            margin-top: -10px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        .profile-box {
+            background-color: #f8d112;
+            padding: 10px;
+            border-radius: 6px;
+            text-align: center;
+            font-size: 14px;
+            margin-top: 20px;
+            color: #ecf0f1;
+            font-weight: bold;
+        }
+
+        .profile-box span {
+            font-weight: bold;
+        }
+    </style>
+    <script>
+        function setMinDepartureDate() {
+            var today = new Date().toISOString().split('T')[0];
+            document.getElementById("departureDate").setAttribute('min', today);
+        }
+
+        function updateArrivalDateMin() {
+            var departureDate = document.getElementById("departureDate").value;
+            var arrivalDateInput = document.getElementById("arrivalDate");
+
+            if (departureDate) {
+                arrivalDateInput.setAttribute('min', departureDate);
+
+                if (arrivalDateInput.value && arrivalDateInput.value < departureDate) {
+                    arrivalDateInput.value = "";
+                    alert("Please select an arrival date that is after the departure date.");
+                }
+            }
+        }
+
+        function updateLandingOptions() {
+            var departureSelect = document.getElementById("departure");
+            var landingSelect = document.getElementById("landing");
+            var selectedDeparture = departureSelect.value;
+
+            for (var i = 0; i < landingSelect.options.length; i++) {
+                landingSelect.options[i].disabled = false;
+            }
+
+            for (var i = 0; i < landingSelect.options.length; i++) {
+                if (landingSelect.options[i].value === selectedDeparture) {
+                    landingSelect.options[i].disabled = true;
+                    break;
+                }
+            }
+        }
+        function filterOptions(searchInputId, selectId) {
+            var input = document.getElementById(searchInputId);
+            var filter = input.value.toUpperCase();
+            var select = document.getElementById(selectId);
+            var options = select.getElementsByTagName('option');
+
+            for (var i = 0; i < options.length; i++) {
+                var txtValue = options[i].textContent || options[i].innerText;
+                if (txtValue.toUpperCase().indexOf(filter) > -1) {
+                    options[i].style.display = "";
+                } else {
+                    options[i].style.display = "none";
+                }
+            }
+        }
+        function disappearArrivalDate() {
+            if (document.getElementById("one_way").checked) {
+                document.getElementById("arrivalDateDiv").style.display = "none";
+                document.getElementById("arrivalDate").required = false;
+            } else {
+                document.getElementById("arrivalDateDiv").style.display = "block";
+                document.getElementById("arrivalDate").required = true;
+            }
+        }
+
+        window.onload = function () {
+            setMinDepartureDate();
+
+            var departureDateInput = document.getElementById("departureDate");
+            if (departureDateInput.value) {
+                updateArrivalDateMin();
+            }
+
+            departureDateInput.addEventListener("change", updateArrivalDateMin);
+            updateLandingOptions();
+            document.getElementById("departure").addEventListener("change", updateLandingOptions);
+            document.getElementById("one_way").addEventListener("change", disappearArrivalDate);
+            document.getElementById("roundtrip").addEventListener("change", disappearArrivalDate);
+
+            document.querySelector("searchSubmitButton").addEventListener("click", function (event) {
+                var departureSelect = document.getElementById("departure");
+                var landingSelect = document.getElementById("landing");
+                var dateSelect = document.getElementById("departureDate");
+
+                var adultSelect = document.getElementById("adult");
+                var childSelect = document.getElementById("child");
+                var infantSelect = document.getElementById("infant");
+
+                var adult = parseInt(adultSelect.value);
+                var selectedDeparture = departureSelect.value;
+                var selectedLanding = landingSelect.value;
+
+                if (adult === 0) {
+                    event.preventDefault();
+                    alert("At least one adult must be selected.");
+                }
+
+                if (selectedDeparture === selectedLanding) {
+                    event.preventDefault();
+                    alert("Departure and landing cannot be the same.");
+                }
+            });
+        };
+    </script>
+</head>
+<body>
+<div class="sidebar">
+    <h2>Menu</h2>
+    <a href="/section1" th:href="@{/section1}">Reservation</a>
+    <a href="/section2" th:href="@{/section2}">Pnr Search</a>
+    <a href="/section3" th:href="@{/section3}">User Management</a>
+    <a href="/section4" th:href="@{/section4}">Help</a>
+    <div class="profile-box">
+        Logged in as: <span sec:authentication="principal.username"></span>
+        <br>
+        Member No: <span th:text="${user.memberNo}"></span>
+        <br>
+        Membership: <span th:text="${user.membership}"></span>
+        <br>
+        Flight Points: <span th:text="${user.points}"></span>
+    </div>
+
+    <div class="logout-form">
+        <form action="#" th:action="@{/logout}" method="post">
+            <input type="submit" value="Logout">
+        </form>
+    </div>
+
+</div>
+
+<div class="main-content" id="main-content">
+    <div class="container">
+        <h1>Search Plane</h1>
+
+        <form action="#" th:action="@{/main-page/checkValid}" th:object="${flight}" method="post">
+            <div th:if="${error}" class="error-message" th:text="${error}"></div>
+            <div class="radio-group">
+                <input type="radio" id="one_way" name="choice" th:field="*{direction}" value="One-Way" required>
+                <label for="one_way">ONE WAY</label>
+
+                <input type="radio" id="roundtrip" name="choice" th:field="*{direction}" value="Roundtrip" required>
+                <label for="roundtrip">ROUND TRIP</label>
+            </div>
+
+            <div class="form-group">
+                <label for="departure">Departure Port</label>
+                <select id="departure" th:field="*{departure}">
+                    <option th:each="cont: ${countries}" th:value="${cont}" th:text="${cont}"></option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="landing">Arrival Port</label>
+                <select id="landing" th:field="*{landing}">
+                    <option th:each="cont: ${countries}" th:value="${cont}" th:text="${cont}"></option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="departureDate">Departure Date</label>
+                <input type="date" id="departureDate" th:field="*{departureDate}" required />
+            </div>
+
+            <div class="form-group" id="arrivalDateDiv">
+                <label for="arrivalDate">Arrival Date</label>
+                <input type="date" id="arrivalDate" th:field="*{arrivalDate}" />
+            </div>
+
+            <div class="form-group">
+                <label for="adult">Adult Count</label>
+                <select id="adult" th:field="*{adult}" required>
+                    <option th:each="num: ${numbers}" th:value="${num}" th:text="${num}"></option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="child">Child Count</label>
+                <select id="child" th:field="*{child}">
+                    <option th:each="num: ${numbers}" th:value="${num}" th:text="${num}"></option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="infant">Infant Count</label>
+                <select id="infant" th:field="*{infant}">
+                    <option th:each="num: ${numbers}" th:value="${num}" th:text="${num}"></option>
+                </select>
+            </div>
+
+            <input type="submit" id="searchSubmitButton" value="Search">
+        </form>
+
+    </div>
+</div>
+
+</body>
+</html>

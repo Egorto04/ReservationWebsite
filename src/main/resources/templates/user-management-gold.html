@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <title>User Management</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+            color: #333;
+            display: flex;
+        }
+
+        .sidebar {
+            width: 250px;
+            background-color: #efba27;
+            color: #ecf0f1;
+            height: 100vh;
+            font-weight: bold;
+            position: fixed;
+            top: 0;
+            left: 0;
+            padding: 20px;
+            box-sizing: border-box;
+            transition: background-color 0.3s ease;
+        }
+
+        .sidebar h2 {
+            color: #ecf0f1;
+            font-weight: 600;
+            margin-bottom: 30px;
+        }
+
+        .sidebar a {
+            color: #ffffff;
+            display: block;
+            padding: 12px;
+            text-decoration: none;
+            margin-bottom: 15px;
+            border-radius: 6px;
+            transition: background-color 0.3s ease;
+            font-weight: bold;
+        }
+
+        .sidebar a:hover {
+            background-color: #cb9f1b;
+        }
+
+        .main-content {
+            margin-left: 270px;
+            padding: 40px;
+            flex-grow: 1;
+            background-color: #ecf0f1;
+            transition: background-color 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .container {
+            background-color: #ffffff;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fadeInUp 0.6s ease forwards;
+            max-width: 600px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .header {
+            text-align: center;
+            font-size: 28px;
+            color: #2c3e50;
+            margin-bottom: 30px;
+        }
+
+        label {
+            font-weight: bold;
+            color: #34495e;
+            display: block;
+            margin-bottom: 8px;
+            text-align: left;
+        }
+
+        .logout-form {
+            margin-top: 30px;
+            text-align: center;
+        }
+
+        .logout-form input[type="submit"] {
+            width: auto;
+            padding: 10px 20px;
+            background-color: #e74c3c;
+        }
+
+        .logout-form input[type="submit"]:hover {
+            background-color: #c0392b;
+        }
+
+        input[type="text"],
+        input[type="password"] {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 20px;
+            border: 1px solid #bdc3c7;
+            border-radius: 6px;
+            font-size: 16px;
+            box-sizing: border-box;
+            transition: border-color 0.3s ease;
+        }
+
+        input[type="text"]:focus,
+        input[type="password"]:focus {
+            border-color: #efba27;
+            outline: none;
+        }
+
+        input[type="submit"] {
+            width: 100%;
+            background-color: #efba27;
+            color: white;
+            padding: 14px 20px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s ease, transform 0.3s ease;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        input[type="submit"]:hover {
+            background-color: #cb9f1b;
+            transform: scale(1.02);
+        }
+        input[type="button"] {
+            width: 100%;
+            background-color: #efba27;
+            color: white;
+            padding: 14px 20px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s ease, transform 0.3s ease;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        input[type="button"]:hover {
+            background-color: #cb9f1b;
+            transform: scale(1.02);
+        }
+        .error-message {
+            color: red;
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .password-container {
+            position: relative;
+        }
+
+        .toggle-password {
+            position: absolute;
+            right: 10px;
+            top: 55%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 14px;
+            color: #cb9f1b;
+        }
+
+        .toggle-password1 {
+            position: absolute;
+            right: 10px;
+            top: 55%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 14px;
+            color: #cb9f1b;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.5);
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background-color: #fefefe;
+            padding: 20px;
+            border-radius: 8px;
+            width: 300px;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .modal-button {
+            padding: 10px 20px;
+            margin: 10px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        .modal-button.confirm {
+            background-color: #e74c3c;
+            color: white;
+        }
+
+        .modal-button.cancel {
+            background-color: #bdc3c7;
+            color: white;
+        }
+
+        .modal-button.confirm:hover {
+            background-color: #c0392b;
+        }
+
+        .modal-button.cancel:hover {
+            background-color: #95a5a6;
+        }
+        .profile-box {
+            background-color: #f8d112;
+            padding: 10px;
+            border-radius: 6px;
+            text-align: center;
+            font-size: 14px;
+            margin-top: 20px;
+            color: #ecf0f1;
+            font-weight: bold;
+        }
+
+        .profile-box span {
+            font-weight: bold;
+        }
+    </style>
+    <script>
+        function togglePasswordVisibility() {
+            var passwordInput = document.getElementById("password");
+            var toggleButton = document.querySelector(".toggle-password");
+            if (passwordInput.type === "password") {
+                passwordInput.type = "text";
+                toggleButton.textContent = "Hide";
+            } else {
+                passwordInput.type = "password";
+                toggleButton.textContent = "Show";
+            }
+        }
+
+        function toggleConfirmPasswordVisibility() {
+            var passwordInput = document.getElementById("confirmPassword");
+            var toggleButton = document.querySelector(".toggle-password1");
+            if (passwordInput.type === "password") {
+                passwordInput.type = "text";
+                toggleButton.textContent = "Hide";
+            } else {
+                passwordInput.type = "password";
+                toggleButton.textContent = "Show";
+            }
+        }
+
+        // Modal control
+        function showModal() {
+            var modal = document.getElementById("confirmationModal");
+            modal.style.display = "flex";
+        }
+
+        function closeModal() {
+            var modal = document.getElementById("confirmationModal");
+            modal.style.display = "none";
+        }
+
+        function confirmDeleteProfile() {
+            closeModal();
+            document.getElementById("deleteProfileForm").submit();
+        }
+
+        window.onclick = function(event) {
+            var modal = document.getElementById("confirmationModal");
+            if (event.target === modal) {
+                closeModal();
+            }
+        }
+    </script>
+    <script>
+        document.getElementById('password').addEventListener('input', function() {
+            var passwordInput = document.getElementById('password');
+            var pattern = /(?=.*\d)(?=.*[A-Z]).{8,}/;
+            var message = document.getElementById('passwordMessage');
+
+            if (!pattern.test(passwordInput.value)) {
+                message.style.display = 'block';
+            } else {
+                message.style.display = 'none';
+            }
+        });
+    </script>
+</head>
+<body>
+<div class="sidebar">
+    <h2>Menu</h2>
+    <a href="/section1" th:href="@{/section1}">Reservation</a>
+    <a href="/section2" th:href="@{/section2}">Pnr Search</a>
+    <a href="/section3" th:href="@{/section3}">User Management</a>
+    <a href="/section4" th:href="@{/section4}">Help</a>
+
+    <div class="profile-box">
+        Logged in as: <span sec:authentication="principal.username"></span>
+        <br>
+        Member No: <span th:text="${user.memberNo}"></span>
+        <br>
+        Membership: <span th:text="${user.membership}"></span>
+        <br>
+        Flight Points: <span th:text="${user.points}"></span>
+    </div>
+    <div class="logout-form">
+        <form action="#" th:action="@{/logout}" method="post">
+            <input type="submit" value="Logout">
+        </form>
+    </div>
+</div>
+
+<div class="main-content">
+    <div class="container">
+        <h2 class="header">Search User</h2>
+        <div th:if="${error2 != null}" class="error-message">
+            <p th:text="${error2}"></p>
+        </div>
+        <form th:action="@{/main-page/find-user}" method="get">
+            <label for="findUser">Member NO:</label>
+            <input type="text" id="findUser" name="memberNo" required>
+            <input type="submit" value="SEARCH USER">
+        </form>
+    </div>
+
+    <div class="container">
+        <h2 class="header">User Management</h2>
+        <div th:if="${error != null}" class="error-message">
+            <p th:text="${error}"></p>
+        </div>
+        <form th:action="@{/main-page/add-user}" method="post">
+
+            <label for="firstName">First Name:</label>
+            <input type="text" id="firstName" name="firstName" required>
+
+            <label for="lastName">Last Name:</label>
+            <input type="text" id="lastName" name="lastName" required>
+
+            <label for="email">Email:</label>
+            <input type="text" id="email" name="email" required>
+
+            <label for="username">Username:</label>
+            <input type="text" id="username" name="username" required>
+
+
+            <div class="password-container">
+                <label for="password">Password:</label>
+                <input type="password" id="password" name="password"
+                       pattern="(?=.*\d)(?=.*[A-Z]).{8,}"
+                       title="Password must be at least 8 characters long and contain at least one uppercase letter and one number."
+                       required>
+                <button type="button" class="toggle-password" onclick="togglePasswordVisibility()">Show</button>
+            </div>
+
+            <div class="password-container">
+                <label for="confirmPassword">Password (Again):</label>
+                <input type="password" id="confirmPassword" name="confirmPassword" required>
+                <button type="button" class="toggle-password1" onclick="toggleConfirmPasswordVisibility()">Show</button>
+            </div>
+            <div id="passwordMessage" style="color: red; display:none;">
+                <p>Password must be at least 8 characters long and contain at least one uppercase letter and one number.</p>
+            </div>
+            <input type="submit" value="ADD USER">
+        </form>
+    </div>
+
+    <div class="container">
+        <h2 class="header">Delete User</h2>
+        <div th:if="${error1 != null}" class="error-message">
+            <p th:text="${error1}"></p>
+        </div>
+        <form th:action="@{/main-page/delete-user}" method="post">
+            <label for="delUsername">Username:</label>
+            <input type="text" id="delUsername" name="delUsername" required>
+            <input type="submit" value="DELETE USER">
+        </form>
+    </div>
+
+    <div class="container">
+        <h2 class="header">Delete Own Profile</h2>
+        <form id="deleteProfileForm" th:action="@{/main-page/delete-profile}" method="post">
+            <input type="button" value="DELETE PROFILE" onclick="showModal()">
+        </form>
+    </div>
+</div>
+
+<!-- Confirmation Modal -->
+<div id="confirmationModal" class="modal">
+    <div class="modal-content">
+        <h3>Are you sure?</h3>
+        <p>All the reservations will be canceled and refund will not be done!</p>
+        <p>This action cannot be undone.</p>
+        <button class="modal-button confirm" onclick="confirmDeleteProfile()">Yes, Delete</button>
+        <button class="modal-button cancel" onclick="closeModal()">Cancel</button>
+    </div>
+</div>
+
+</body>
+</html>

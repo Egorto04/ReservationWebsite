@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Find Reservation</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+            color: #333;
+            display: flex;
+        }
+
+        .sidebar {
+            width: 250px;
+            background-color: #efba27;
+            color: #ecf0f1;
+            height: 100vh;
+            font-weight: bold;
+            position: fixed;
+            top: 0;
+            left: 0;
+            padding: 20px;
+            box-sizing: border-box;
+            transition: background-color 0.3s ease;
+        }
+
+        .sidebar h2 {
+            color: #ecf0f1;
+            font-weight: 600;
+            margin-bottom: 30px;
+        }
+
+        .sidebar a {
+            color: #ffffff;
+            display: block;
+            padding: 12px;
+            text-decoration: none;
+            margin-bottom: 15px;
+            border-radius: 6px;
+            transition: background-color 0.3s ease;
+            font-weight: bold;
+        }
+
+        .sidebar a:hover {
+            background-color: #cb9f1b;
+        }
+
+        .container {
+            margin-left: 270px;
+            padding: 40px;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background-color: #ecf0f1;
+            transition: background-color 0.3s ease;
+        }
+
+        .form-container {
+            background-color: #ffffff;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            max-width: 450px;
+            width: 100%;
+            text-align: center;
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fadeInUp 0.6s ease forwards;
+            margin-bottom: 20px; /* Added margin for spacing between forms */
+        }
+
+        .form-container h1 {
+            margin-bottom: 30px;
+            font-size: 28px;
+            color: #2c3e50;
+        }
+
+        .form-container label {
+            font-weight: bold;
+            margin-bottom: 8px;
+            display: block;
+            text-align: left;
+            color: #34495e;
+        }
+
+        .form-container input[type="text"] {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 20px;
+            border: 1px solid #bdc3c7;
+            border-radius: 6px;
+            font-size: 16px;
+            box-sizing: border-box;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-container input[type="text"]:focus {
+            border-color: #efba27;
+            outline: none;
+        }
+
+        .form-container input[type="submit"] {
+            background-color: #efba27;
+            color: white;
+            border: none;
+            padding: 14px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s ease, transform 0.3s ease;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .form-container input[type="submit"]:hover {
+            background-color: #cb9f1b;
+            transform: scale(1.02);
+        }
+
+        .form-container .info-text {
+            margin-top: 20px;
+            color: #777;
+            font-size: 14px;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        .logout-form {
+            margin-top: 30px;
+            text-align: center;
+        }
+        input[type="submit"] {
+            width: 100%;
+            background-color: #efba27;
+            color: white;
+            padding: 14px 20px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s ease, transform 0.3s ease;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .logout-form input[type="submit"] {
+            width: auto;
+            padding: 10px 20px;
+            background-color: #e74c3c;
+        }
+
+        .logout-form input[type="submit"]:hover {
+            background-color: #c0392b;
+        }
+        ul {
+            list-style: none;
+            padding: 0;
+            margin: 20px 0;
+        }
+
+        ul li {
+            background-color: #ffffff;
+            border: 1px solid #ccc;
+            padding: 15px 20px;
+            margin-bottom: 10px;
+            border-radius: 8px;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        ul li:hover {
+            transform: scale(1.03);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+        }
+
+        ul li span {
+            font-weight: bold;
+            font-size: 16px;
+            color: #efba27;
+        }
+
+        ul li.ticketed::before {
+            content: '\2713'; /* Checkmark icon */
+            margin-right: 10px;
+            font-size: 18px;
+            color: #2ecc71;
+        }
+
+        ul li.not-ticketed::before {
+            content: '\2717'; /* Cross icon */
+            margin-right: 10px;
+            font-size: 18px;
+            color: #e74c3c;
+        }
+        .profile-box {
+            background-color: #f8d112;
+            padding: 10px;
+            border-radius: 6px;
+            text-align: center;
+            font-size: 14px;
+            margin-top: 20px;
+            color: #ecf0f1;
+        }
+
+        .profile-box span {
+            font-weight: bold;
+        }
+
+    </style>
+</head>
+<body>
+
+<div class="sidebar">
+    <h2>Menu</h2>
+    <a href="/section1" th:href="@{/section1}">Reservation</a>
+    <a href="/section2" th:href="@{/section2}">Pnr Search</a>
+    <a href="/section3" th:href="@{/section3}">User Management</a>
+    <a href="/section4" th:href="@{/section4}">Help</a>
+    <div class="profile-box">
+        Logged in as: <span sec:authentication="principal.username"></span>
+        <br>
+        Member No: <span th:text="${user.memberNo}"></span>
+        <br>
+        Membership: <span th:text="${user.membership}"></span>
+        <br>
+        Flight Points: <span th:text="${user.points}"></span>
+    </div>
+    <div class="logout-form">
+        <form action="#" th:action="@{/logout}" method="post">
+            <input type="submit" value="Logout">
+        </form>
+    </div>
+
+
+
+
+</div>
+
+<div class="container">
+    <div class="form-container">
+        <h1>Find Your Reservation</h1>
+        <div th:if="${error} != null" style="color: red; margin-bottom: 20px;" th:text="${error}"></div>
+
+        <form th:action="@{/main-page/find-reservation-info}" method="post">
+            <label for="pnrCode">PNR Code:</label>
+            <input type="text" id="pnrCode" name="pnrCode" required placeholder="Enter your PNR code">
+            <input type="submit" value="Find Reservation">
+        </form>
+        <div class="info-text">
+            <p>Enter the PNR code provided in your booking confirmation.</p>
+        </div>
+
+        <div th:if="${pnrCodes != null && !pnrCodes.isEmpty()}">
+            <h2>Own Reservation PNRs</h2>
+            <ul id="pnrList">
+                <li th:each="pnr : ${pnrCodes}" th:classappend="${pnr.status} == 'TICKETED' ? 'ticketed' : 'not-ticketed'">
+                    <span th:text="${pnr.pnrCode}" ></span>
+                </li>
+            </ul>
+        </div>
+    </div>
+    <div class="form-container">
+        <h1>Find Your Reservation</h1>
+        <div th:if="${error1} != null" style="color: red; margin-bottom: 20px;" th:text="${error1}"></div>
+
+        <form th:action="@{/main-page/append-reservation}" method="post">
+            <label for="pnr">PNR Code:</label>
+            <input type="text" id="pnr" name="pnr" required placeholder="Enter your PNR code">
+            <label for="nationalityNo">Nationality No:</label>
+            <input type="text" id="nationalityNo" name="nationalityNo" required placeholder="Enter your Nationality No">
+            <input type="submit" value="Find Reservation">
+        </form>
+        <div class="info-text">
+            <p>Enter the PNR code provided in your booking confirmation.</p>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const pnrListItems = document.querySelectorAll('#pnrList li');
+        const pnrInput = document.getElementById('pnrCode');
+
+        pnrListItems.forEach(item => {
+            item.addEventListener('click', function() {
+                pnrInput.value = this.textContent.trim(); // Set the clicked PNR code in the input box
+            });
+        });
+    });
+</script>
+</body>
+</html>

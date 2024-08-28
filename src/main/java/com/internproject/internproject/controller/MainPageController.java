@@ -97,6 +97,10 @@ public class MainPageController {
         String username = authentication.getName();
         User u = companyService.findUserByUsername(username);
         model.addAttribute("user", u);
+        if (u.getMembership().equals("Gold"))
+        {
+            return "main-page-gold";
+        }
         return "main-page";
     }
 
@@ -366,6 +370,10 @@ public class MainPageController {
         String username = authentication.getName();
         User u = companyService.findUserByUsername(username);
         model.addAttribute("user", u);
+        if (u.getMembership().equals("Gold"))
+        {
+            return "help-gold";
+        }
         return "help";
     }
     @RequestMapping("/payment-search")
@@ -746,6 +754,10 @@ public class MainPageController {
         String username = authentication.getName();
         User u = companyService.findUserByUsername(username);
         model.addAttribute("user", u);
+        if (u.getMembership().equals("Gold"))
+        {
+            return "user-management-gold";
+        }
         return "user-management";
     }
 
@@ -801,6 +813,10 @@ public class MainPageController {
         }
         User u = companyService.findUserByUsername(username);
         model.addAttribute("user", u);
+        if (u.getMembership().equals("Gold"))
+        {
+            return "find-reservation-gold";
+        }
         return "find-reservation";
     }
 
